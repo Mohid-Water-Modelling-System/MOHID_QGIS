@@ -107,6 +107,9 @@
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="visible">
+              <bool>false</bool>
+             </property>
              <layout class="QGridLayout" name="gridLayout_4">
               <property name="leftMargin">
                <number>0</number>
@@ -287,13 +290,6 @@
               <item row="2" column="2">
                <widget class="QDoubleSpinBox" name="doubleSpinBoxRegularRowsSpacing"/>
               </item>
-              <item row="3" column="1" colspan="2">
-               <widget class="QPushButton" name="pushButtonPreview">
-                <property name="text">
-                 <string>Preview</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
@@ -325,6 +321,13 @@
             <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QPushButton" name="pushButtonPreview">
+          <property name="text">
+           <string>Preview</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -359,7 +362,6 @@
   <tabstop>doubleSpinBoxRegularColumnsSpacing</tabstop>
   <tabstop>spinBoxRegularRowsQuantity</tabstop>
   <tabstop>doubleSpinBoxRegularRowsSpacing</tabstop>
-  <tabstop>pushButtonPreview</tabstop>
   <tabstop>spinBoxVariableSpacedColumnsQuantity</tabstop>
   <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingStart</tabstop>
   <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingEnd</tabstop>
