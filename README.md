@@ -23,3 +23,15 @@ To activate the MOHID plugin on [QGIS](https://qgis.org/):
 4. Use the `MOHID` checkbox to activate the MOHID plugin
 
 Once activated, a new plugin button should appear in the Toolbar.
+
+## Task list
+
+- [ ] Regular grid creator
+- [ ] Variable spaced grid creator
+- [ ] Set coordinates with mouse capture
+- [x] Dock widget
+- [ ] Read grid from .grd file
+- [ ] Write grit to .grd file
+- [ ] Read grid from .grd file
+- [ ] Write grid to .grd file
+- [ ] Optimize definition of points, lines and polygons
