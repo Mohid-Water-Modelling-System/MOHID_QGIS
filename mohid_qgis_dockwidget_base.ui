@@ -1,531 +1,512 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MohidPluginDockWidgetBase</class>
- <widget class="QDockWidget" name="MohidPluginDockWidgetBase">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>565</width>
-    <height>551</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>MOHID</string>
-  </property>
-  <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="tab_grid">
-       <attribute name="title">
-        <string>Grid</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="8" column="3">
-         <widget class="QPushButton" name="pushButtonLoad">
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="5">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="8" column="4">
-         <widget class="QPushButton" name="pushButtonSave">
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="5">
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Parameters</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="1" colspan="3">
-            <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="labelAngle">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Angle:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0" colspan="4">
-            <widget class="QWidget" name="widgetRegular" native="true">
-             <layout class="QGridLayout" name="gridLayout_3">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="1">
-               <widget class="QLabel" name="labelRegularQuantity">
-                <property name="text">
-                 <string>Quantity</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="spinBoxRegularRowsQuantity">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="labelRegularSpacing">
-                <property name="text">
-                 <string>Spacing</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelRegularColumns">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Columns:</string>
-                </property>
-                <property name="scaledContents">
-                 <bool>false</bool>
-                </property>
-                <property name="wordWrap">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxRegularColumnsSpacing">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelRegularRows">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Rows:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="spinBoxRegularColumnsQuantity">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxRegularRowsSpacing">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxOriginLatitude">
-             <property name="decimals">
-              <number>9</number>
-             </property>
-             <property name="minimum">
-              <double>-999999999.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>999999999.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="4">
-            <widget class="Line" name="line_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelCRS">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>CRS:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxOriginLongitude">
-             <property name="decimals">
-              <number>9</number>
-             </property>
-             <property name="minimum">
-              <double>-999999999.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>999999999.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="3">
-            <widget class="QToolButton" name="toolButtonCapturePoint">
-             <property name="text">
-              <string>...</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="4">
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelLatitude">
-             <property name="text">
-              <string>Latitude</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0" colspan="4">
-            <widget class="Line" name="line_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QRadioButton" name="radioButtonRegular">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>Regular</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QLabel" name="labelLongitude">
-             <property name="text">
-              <string>Longitude</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="QRadioButton" name="radioButtonVariableSpaced">
-             <property name="text">
-              <string>Variable-Spaced</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1" colspan="3">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxAngle"/>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="labelType">
-             <property name="text">
-              <string>Type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="labelOrigin">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Origin:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="labelLayerName">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Layer Name:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="1" colspan="3">
-            <widget class="QLineEdit" name="lineEditLayerName"/>
-           </item>
-           <item row="10" column="0" colspan="4">
-            <widget class="QWidget" name="widgetVariableSpaced" native="true">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="visible">
-              <bool>false</bool>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_4">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item row="3" column="0">
-               <widget class="QLabel" name="labelVariableSpacedRows">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Rows:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="labelVariableSpacedQuantity">
-                <property name="text">
-                 <string>Quantity</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedRowsSpacingStart">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="3">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedRowsSpacingEnd">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2" colspan="2">
-               <widget class="QLabel" name="labelSpacingRange">
-                <property name="text">
-                 <string>Spacing Range</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedColumnsSpacingEnd">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="4">
-               <widget class="QPushButton" name="pushButtonColumnsAdd">
-                <property name="text">
-                 <string>Add</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="spinBoxVariableSpacedRowsQuantity">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="spinBoxVariableSpacedColumnsQuantity">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="4">
-               <widget class="QPushButton" name="pushButtonRowsAdd">
-                <property name="text">
-                 <string>Add</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelVariableSpacedColumns">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Columns:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedColumnsSpacingStart">
-                <property name="decimals">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <double>999999999.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="8" column="2">
-         <widget class="QPushButton" name="pushButtonPreview">
-          <property name="text">
-           <string>Preview</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_bathymetry">
-       <attribute name="title">
-        <string>Bathymetry</string>
-       </attribute>
-      </widget>
-     </widget>
-    </item>
-   </layout>
-  </widget>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsProjectionSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsprojectionselectionwidget.h</header>
-  </customwidget>
- </customwidgets>
- <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>mQgsProjectionSelectionWidget</tabstop>
-  <tabstop>doubleSpinBoxOriginLatitude</tabstop>
-  <tabstop>doubleSpinBoxOriginLongitude</tabstop>
-  <tabstop>doubleSpinBoxAngle</tabstop>
-  <tabstop>radioButtonRegular</tabstop>
-  <tabstop>radioButtonVariableSpaced</tabstop>
-  <tabstop>spinBoxRegularColumnsQuantity</tabstop>
-  <tabstop>doubleSpinBoxRegularColumnsSpacing</tabstop>
-  <tabstop>spinBoxRegularRowsQuantity</tabstop>
-  <tabstop>doubleSpinBoxRegularRowsSpacing</tabstop>
-  <tabstop>spinBoxVariableSpacedColumnsQuantity</tabstop>
-  <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingStart</tabstop>
-  <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingEnd</tabstop>
-  <tabstop>pushButtonColumnsAdd</tabstop>
-  <tabstop>spinBoxVariableSpacedRowsQuantity</tabstop>
-  <tabstop>doubleSpinBoxVariableSpacedRowsSpacingStart</tabstop>
-  <tabstop>doubleSpinBoxVariableSpacedRowsSpacingEnd</tabstop>
-  <tabstop>pushButtonRowsAdd</tabstop>
-  <tabstop>pushButtonLoad</tabstop>
-  <tabstop>pushButtonSave</tabstop>
- </tabstops>
- <resources/>
- <connections/>
+    <class>MohidPluginDockWidgetBase</class>
+    <widget class="QDockWidget" name="MohidPluginDockWidgetBase">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>552</width>
+                <height>470</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MOHID</string>
+        </property>
+        <widget class="QWidget" name="dockWidgetContents">
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                    <widget class="QTabWidget" name="tabWidget">
+                        <property name="currentIndex">
+                            <number>0</number>
+                        </property>
+                        <widget class="QWidget" name="tab_grid">
+                            <attribute name="title">
+                                <string>Grid</string>
+                            </attribute>
+                            <layout class="QGridLayout" name="gridLayout_2">
+                                <item row="7" column="0" colspan="5">
+                                    <spacer name="verticalSpacer">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>40</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="8" column="2">
+                                    <widget class="QPushButton" name="pushButtonPreview">
+                                        <property name="text">
+                                            <string>Preview</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="8" column="4">
+                                    <widget class="QPushButton" name="pushButtonSave">
+                                        <property name="text">
+                                            <string>Save</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="8" column="3">
+                                    <widget class="QPushButton" name="pushButtonLoad">
+                                        <property name="text">
+                                            <string>Load</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="6" column="0" colspan="5">
+                                    <widget class="QGroupBox" name="groupBox">
+                                        <property name="title">
+                                            <string>Parameters</string>
+                                        </property>
+                                        <layout class="QGridLayout" name="gridLayout">
+                                            <item row="6" column="1">
+                                                <widget class="QRadioButton" name="radioButtonRegular">
+                                                    <property name="enabled">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Regular</string>
+                                                    </property>
+                                                    <property name="checked">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="6" column="2">
+                                                <widget class="QRadioButton" name="radioButtonVariableSpaced">
+                                                    <property name="text">
+                                                        <string>Variable-Spaced</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="2" column="2">
+                                                <widget class="QLabel" name="labelLongitude">
+                                                    <property name="text">
+                                                        <string>Longitude</string>
+                                                    </property>
+                                                    <property name="alignment">
+                                                        <set>Qt::AlignCenter</set>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="8" column="1" rowspan="3" colspan="3">
+                                                <widget class="QWidget" name="widgetRegular" native="true">
+                                                    <layout class="QGridLayout" name="gridLayout_3">
+                                                        <property name="leftMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="topMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="rightMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="bottomMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <item row="0" column="2">
+                                                            <widget class="QLabel" name="labelRegularSpacing">
+                                                                <property name="text">
+                                                                    <string>Spacing</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="1" column="2">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxRegularColumnsSpacing">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="2" column="2">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxRegularRowsSpacing">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="2" column="1">
+                                                            <widget class="QSpinBox" name="spinBoxRegularRowsQuantity">
+                                                                <property name="minimum">
+                                                                    <number>1</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <number>999999999</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="1" column="1">
+                                                            <widget class="QSpinBox" name="spinBoxRegularColumnsQuantity">
+                                                                <property name="minimum">
+                                                                    <number>1</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <number>999999999</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="1">
+                                                            <widget class="QLabel" name="labelRegularQuantity">
+                                                                <property name="text">
+                                                                    <string>Quantity</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                            <item row="5" column="0">
+                                                <widget class="QLabel" name="labelAngle">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Angle:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="11" column="1" colspan="3">
+                                                <widget class="QLineEdit" name="lineEditLayerName" />
+                                            </item>
+                                            <item row="6" column="0">
+                                                <widget class="QLabel" name="labelType">
+                                                    <property name="text">
+                                                        <string>Type:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="3" column="3">
+                                                <widget class="QToolButton" name="toolButtonCapturePoint">
+                                                    <property name="text">
+                                                        <string>...</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="3" column="1">
+                                                <widget class="QDoubleSpinBox" name="doubleSpinBoxOriginLatitude">
+                                                    <property name="decimals">
+                                                        <number>9</number>
+                                                    </property>
+                                                    <property name="minimum">
+                                                        <double>-999999999.000000000000000</double>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <double>999999999.000000000000000</double>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="3" column="2">
+                                                <widget class="QDoubleSpinBox" name="doubleSpinBoxOriginLongitude">
+                                                    <property name="decimals">
+                                                        <number>9</number>
+                                                    </property>
+                                                    <property name="minimum">
+                                                        <double>-999999999.000000000000000</double>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <double>999999999.000000000000000</double>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="4" column="0" colspan="4">
+                                                <widget class="Line" name="line_2">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="5" column="1" colspan="3">
+                                                <widget class="QDoubleSpinBox" name="doubleSpinBoxAngle">
+                                                    <property name="minimum">
+                                                        <number>-999</number>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <number>999</number>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="0" column="1" colspan="3">
+                                                <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget" />
+                                            </item>
+                                            <item row="1" column="0" colspan="4">
+                                                <widget class="Line" name="line">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="3" column="0">
+                                                <widget class="QLabel" name="labelOrigin">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Origin:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="11" column="0">
+                                                <widget class="QLabel" name="labelLayerName">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Layer Name:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="2" column="1">
+                                                <widget class="QLabel" name="labelLatitude">
+                                                    <property name="text">
+                                                        <string>Latitude</string>
+                                                    </property>
+                                                    <property name="alignment">
+                                                        <set>Qt::AlignCenter</set>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="8" column="1" rowspan="3" colspan="3">
+                                                <widget class="QWidget" name="widgetVariableSpaced" native="true">
+                                                    <property name="enabled">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="visible">
+                                                        <bool>false</bool>
+                                                    </property>
+                                                    <layout class="QGridLayout" name="gridLayout_4">
+                                                        <property name="leftMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="topMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="rightMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <property name="bottomMargin">
+                                                            <number>0</number>
+                                                        </property>
+                                                        <item row="2" column="4">
+                                                            <widget class="QPushButton" name="pushButtonColumnsAdd">
+                                                                <property name="text">
+                                                                    <string>Add</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="3" column="4">
+                                                            <widget class="QPushButton" name="pushButtonRowsAdd">
+                                                                <property name="text">
+                                                                    <string>Add</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="2" colspan="2">
+                                                            <widget class="QLabel" name="labelSpacingRange">
+                                                                <property name="text">
+                                                                    <string>Spacing Range</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="1">
+                                                            <widget class="QLabel" name="labelVariableSpacedQuantity">
+                                                                <property name="text">
+                                                                    <string>Quantity</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="2" column="3">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedColumnsSpacingEnd">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="3" column="3">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedRowsSpacingEnd">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="2" column="2">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedColumnsSpacingStart">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="3" column="2">
+                                                            <widget class="QDoubleSpinBox" name="doubleSpinBoxVariableSpacedRowsSpacingStart">
+                                                                <property name="decimals">
+                                                                    <number>9</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <double>999999999.000000000000000</double>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="2" column="1">
+                                                            <widget class="QSpinBox" name="spinBoxVariableSpacedColumnsQuantity">
+                                                                <property name="minimum">
+                                                                    <number>1</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <number>999999999</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="3" column="1">
+                                                            <widget class="QSpinBox" name="spinBoxVariableSpacedRowsQuantity">
+                                                                <property name="minimum">
+                                                                    <number>1</number>
+                                                                </property>
+                                                                <property name="maximum">
+                                                                    <number>999999999</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                            <item row="0" column="0">
+                                                <widget class="QLabel" name="labelCRS">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>CRS:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="7" column="0" colspan="4">
+                                                <widget class="Line" name="line_3">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="10" column="0">
+                                                <widget class="QLabel" name="labelRows">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Rows:</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="9" column="0">
+                                                <widget class="QLabel" name="labelColumns">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Columns:</string>
+                                                    </property>
+                                                    <property name="scaledContents">
+                                                        <bool>false</bool>
+                                                    </property>
+                                                    <property name="wordWrap">
+                                                        <bool>false</bool>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="tab_bathymetry">
+                            <attribute name="title">
+                                <string>Bathymetry</string>
+                            </attribute>
+                        </widget>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>QgsProjectionSelectionWidget</class>
+            <extends>QWidget</extends>
+            <header>qgsprojectionselectionwidget.h</header>
+        </customwidget>
+    </customwidgets>
+    <tabstops>
+        <tabstop>tabWidget</tabstop>
+        <tabstop>mQgsProjectionSelectionWidget</tabstop>
+        <tabstop>doubleSpinBoxOriginLatitude</tabstop>
+        <tabstop>doubleSpinBoxOriginLongitude</tabstop>
+        <tabstop>doubleSpinBoxAngle</tabstop>
+        <tabstop>radioButtonRegular</tabstop>
+        <tabstop>radioButtonVariableSpaced</tabstop>
+        <tabstop>spinBoxRegularColumnsQuantity</tabstop>
+        <tabstop>doubleSpinBoxRegularColumnsSpacing</tabstop>
+        <tabstop>spinBoxRegularRowsQuantity</tabstop>
+        <tabstop>doubleSpinBoxRegularRowsSpacing</tabstop>
+        <tabstop>spinBoxVariableSpacedColumnsQuantity</tabstop>
+        <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingStart</tabstop>
+        <tabstop>doubleSpinBoxVariableSpacedColumnsSpacingEnd</tabstop>
+        <tabstop>pushButtonColumnsAdd</tabstop>
+        <tabstop>spinBoxVariableSpacedRowsQuantity</tabstop>
+        <tabstop>doubleSpinBoxVariableSpacedRowsSpacingStart</tabstop>
+        <tabstop>doubleSpinBoxVariableSpacedRowsSpacingEnd</tabstop>
+        <tabstop>pushButtonRowsAdd</tabstop>
+        <tabstop>pushButtonLoad</tabstop>
+        <tabstop>pushButtonSave</tabstop>
+    </tabstops>
+    <resources />
+    <connections />
 </ui>
