@@ -31,6 +31,10 @@ from .resources import *
 from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 
+from .grid import Grid
+from qgis.core import QgsPoint, QgsProject, QgsPointXY
+from .capture_point_tool import CapturePointTool
+
 
 class MohidPlugin:
     """QGIS Plugin Implementation."""
@@ -68,13 +72,13 @@ class MohidPlugin:
         self.toolbar = self.iface.addToolBar(u'MohidPlugin')
         self.toolbar.setObjectName(u'MohidPlugin')
 
-        #print "** INITIALIZING MohidPlugin"
+        # print "** INITIALIZING MohidPlugin"
 
         self.pluginIsActive = False
         self.dockwidget = None
 
-
     # noinspection PyMethodMayBeStatic
+
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -89,18 +93,17 @@ class MohidPlugin:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('MohidPlugin', message)
 
-
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -163,7 +166,6 @@ class MohidPlugin:
 
         return action
 
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -174,12 +176,12 @@ class MohidPlugin:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
-        #print "** CLOSING MohidPlugin"
+        # print "** CLOSING MohidPlugin"
 
         # disconnects
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
@@ -192,11 +194,10 @@ class MohidPlugin:
 
         self.pluginIsActive = False
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
-        #print "** UNLOAD MohidPlugin"
+        # print "** UNLOAD MohidPlugin"
 
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -206,7 +207,7 @@ class MohidPlugin:
         # remove the toolbar
         del self.toolbar
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -214,7 +215,7 @@ class MohidPlugin:
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
-            #print "** STARTING MohidPlugin"
+            # print "** STARTING MohidPlugin"
 
             # dockwidget may not exist if:
             #    first run of plugin
@@ -226,7 +227,68 @@ class MohidPlugin:
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
+            self.dockwidget.pushButtonPreview.clicked.connect(
+                self.previewGrid)
+            self.dockwidget.radioButtonRegular.toggled.connect(
+                self.regularGrid)
+            self.dockwidget.radioButtonVariableSpaced.toggled.connect(
+                self.variableGrid)
+            self.dockwidget.mQgsProjectionSelectionWidget.setCrs(
+                QgsProject.instance().crs())
+            self.dockwidget.toolButtonCapturePoint.setIcon(
+                QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
+            self.dockwidget.toolButtonCapturePoint.clicked.connect(
+                self.capturePoint)
+            self.capturePointTool = None
+
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+
+    def previewGrid(self):
+        crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
+        latitude = float(self.dockwidget.doubleSpinBoxOriginLatitude.value())
+        longitude = float(self.dockwidget.doubleSpinBoxOriginLongitude.value())
+        origin = QgsPoint(latitude, longitude)
+        nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
+        nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
+        ColumnsSpacing = float(
+            self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value())
+        RowsSpacing = float(
+            self.dockwidget.doubleSpinBoxRegularRowsSpacing.value())
+        angle = float(self.dockwidget.doubleSpinBoxAngle.value())
+        grid = Grid(crs, origin, nColumns, nRows,
+                    ColumnsSpacing, RowsSpacing, angle)
+        layerName = self.dockwidget.lineEditLayerName.text()
+        layer = grid.toQgsVectorLayer(layerName)
+        QgsProject.instance().addMapLayer(layer)
+
+    def regularGrid(self):
+        if self.dockwidget.radioButtonRegular.isChecked():
+            self.dockwidget.widgetRegular.setVisible(True)
+            self.dockwidget.pushButtonPreview.setVisible(True)
+        else:
+            self.dockwidget.widgetRegular.setVisible(False)
+            self.dockwidget.pushButtonPreview.setVisible(False)
+
+    def variableGrid(self):
+        if self.dockwidget.radioButtonVariableSpaced.isChecked():
+            self.dockwidget.widgetVariableSpaced.setVisible(True)
+        else:
+            self.dockwidget.widgetVariableSpaced.setVisible(False)
+
+    def capturePoint(self):
+        if(self.iface.mapCanvas().mapTool() is self.capturePointTool):
+            self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
+        else:
+            crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
+            self.capturePointTool = CapturePointTool(self.iface.mapCanvas(), crs)
+            self.iface.mapCanvas().setMapTool(self.capturePointTool)
+            self.capturePointTool.canvasClicked.connect(self.writeCoordinates)
+    
+    def writeCoordinates(self, point: QgsPointXY):
+        self.dockwidget.doubleSpinBoxOriginLatitude.setValue(point.x())
+        self.dockwidget.doubleSpinBoxOriginLongitude.setValue(point.y())
+        self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
+        self.dockwidget.show()
