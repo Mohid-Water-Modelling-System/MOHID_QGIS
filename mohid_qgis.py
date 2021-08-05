@@ -31,7 +31,7 @@ from .resources import *
 from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 
-from .grid import Grid
+from .regular_grid import RegularGrid
 from qgis.core import QgsPoint, QgsProject, QgsPointXY
 from .capture_point_tool import CapturePointTool
 
@@ -248,18 +248,16 @@ class MohidPlugin:
 
     def previewGrid(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
-        latitude = float(self.dockwidget.doubleSpinBoxOriginLatitude.value())
-        longitude = float(self.dockwidget.doubleSpinBoxOriginLongitude.value())
+        latitude = self.dockwidget.doubleSpinBoxOriginLatitude.value()
+        longitude = self.dockwidget.doubleSpinBoxOriginLongitude.value()
         origin = QgsPoint(latitude, longitude)
         nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
         nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
-        ColumnsSpacing = float(
-            self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value())
-        RowsSpacing = float(
-            self.dockwidget.doubleSpinBoxRegularRowsSpacing.value())
-        angle = float(self.dockwidget.doubleSpinBoxAngle.value())
-        grid = Grid(crs, origin, nColumns, nRows,
-                    ColumnsSpacing, RowsSpacing, angle)
+        columnsSpacing = self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value()
+        rowsSpacing = self.dockwidget.doubleSpinBoxRegularRowsSpacing.value()
+        angle = self.dockwidget.doubleSpinBoxAngle.value()
+        grid = RegularGrid(crs, origin, nColumns, nRows,
+                    columnsSpacing, rowsSpacing, angle)
         layerName = self.dockwidget.lineEditLayerName.text()
         layer = grid.toQgsVectorLayer(layerName)
         QgsProject.instance().addMapLayer(layer)
