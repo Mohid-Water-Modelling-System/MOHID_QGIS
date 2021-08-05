@@ -26,12 +26,12 @@ Once activated, a new plugin button should appear in the Toolbar.
 
 ## Task list
 
-- [ ] Regular grid creator
+- [x] Regular grid creator
 - [ ] Variable spaced grid creator
-- [ ] Set coordinates with mouse capture
+- [x] Set coordinates with mouse capture
 - [x] Dock widget
 - [ ] Read grid from .grd file
 - [ ] Write grit to .grd file
 - [ ] Read grid from .grd file
 - [ ] Write grid to .grd file
-- [ ] Optimize definition of points, lines and polygons
+- [x] Optimize definition of points and polygons
