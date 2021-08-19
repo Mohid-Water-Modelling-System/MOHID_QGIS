@@ -31,8 +31,10 @@ from .resources import *
 from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 
+from .point import Point
+from .variable_spaced_grid import VariableSpacedGrid
 from .regular_grid import RegularGrid
-from qgis.core import QgsPoint, QgsProject, QgsPointXY
+from qgis.core import QgsProject, QgsPointXY
 from .capture_point_tool import CapturePointTool
 
 
@@ -76,6 +78,8 @@ class MohidPlugin:
 
         self.pluginIsActive = False
         self.dockwidget = None
+
+        self.capturePointTool = None
 
     # noinspection PyMethodMayBeStatic
 
@@ -228,65 +232,81 @@ class MohidPlugin:
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
             self.dockwidget.pushButtonPreview.clicked.connect(
-                self.previewGrid)
+                self.previewClicked)
             self.dockwidget.radioButtonRegular.toggled.connect(
-                self.regularGrid)
+                self.regularToggled)
             self.dockwidget.radioButtonVariableSpaced.toggled.connect(
-                self.variableGrid)
+                self.variableSpacedToggled)
             self.dockwidget.mQgsProjectionSelectionWidget.setCrs(
                 QgsProject.instance().crs())
             self.dockwidget.toolButtonCapturePoint.setIcon(
                 QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
             self.dockwidget.toolButtonCapturePoint.clicked.connect(
-                self.capturePoint)
-            self.capturePointTool = None
+                self.capturePointClicked)
+            self.dockwidget.lineEditLayerName.textChanged.connect(
+                self.formChanged)
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-    def previewGrid(self):
+    def previewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
         latitude = self.dockwidget.doubleSpinBoxOriginLatitude.value()
         longitude = self.dockwidget.doubleSpinBoxOriginLongitude.value()
-        origin = QgsPoint(latitude, longitude)
-        nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
-        nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
-        columnsSpacing = self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value()
-        rowsSpacing = self.dockwidget.doubleSpinBoxRegularRowsSpacing.value()
+        origin = Point(latitude, longitude)
         angle = self.dockwidget.doubleSpinBoxAngle.value()
-        grid = RegularGrid(crs, origin, nColumns, nRows,
-                    columnsSpacing, rowsSpacing, angle)
+        if self.dockwidget.radioButtonRegular.isChecked():
+            nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
+            nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
+            columnsSpacing = self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value()
+            rowsSpacing = self.dockwidget.doubleSpinBoxRegularRowsSpacing.value()
+            grid = RegularGrid(crs, origin, nColumns, nRows,
+                               columnsSpacing, rowsSpacing, angle)
+        elif self.dockwidget.radioButtonVariableSpaced.isChecked():
+            nColumns = self.dockwidget.spinBoxVariableSpacedColumnsQuantity.value()
+            nRows = self.dockwidget.spinBoxVariableSpacedRowsQuantity.value()
+            columnsSpacingStart = self.dockwidget.doubleSpinBoxVariableSpacedColumnsSpacingStart.value()
+            columnsSpacingEnd = self.dockwidget.doubleSpinBoxVariableSpacedColumnsSpacingEnd.value()
+            rowsSpacingStart = self.dockwidget.doubleSpinBoxVariableSpacedRowsSpacingStart.value()
+            rowsSpacingEnd = self.dockwidget.doubleSpinBoxVariableSpacedRowsSpacingEnd.value()
+            grid = VariableSpacedGrid(crs, origin, nColumns, nRows, columnsSpacingStart, columnsSpacingEnd,
+                                      rowsSpacingStart, rowsSpacingEnd, angle)
         layerName = self.dockwidget.lineEditLayerName.text()
         layer = grid.toQgsVectorLayer(layerName)
         QgsProject.instance().addMapLayer(layer)
 
-    def regularGrid(self):
+    def regularToggled(self):
         if self.dockwidget.radioButtonRegular.isChecked():
             self.dockwidget.widgetRegular.setVisible(True)
-            self.dockwidget.pushButtonPreview.setVisible(True)
         else:
             self.dockwidget.widgetRegular.setVisible(False)
-            self.dockwidget.pushButtonPreview.setVisible(False)
 
-    def variableGrid(self):
+    def variableSpacedToggled(self):
         if self.dockwidget.radioButtonVariableSpaced.isChecked():
             self.dockwidget.widgetVariableSpaced.setVisible(True)
         else:
             self.dockwidget.widgetVariableSpaced.setVisible(False)
 
-    def capturePoint(self):
+    def capturePointClicked(self):
         if(self.iface.mapCanvas().mapTool() is self.capturePointTool):
             self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
         else:
             crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
-            self.capturePointTool = CapturePointTool(self.iface.mapCanvas(), crs)
+            self.capturePointTool = CapturePointTool(
+                self.iface.mapCanvas(), crs)
             self.iface.mapCanvas().setMapTool(self.capturePointTool)
-            self.capturePointTool.canvasClicked.connect(self.writeCoordinates)
-    
-    def writeCoordinates(self, point: QgsPointXY):
+            self.capturePointTool.canvasClicked.connect(self.canvasClicked)
+
+    def canvasClicked(self, point: QgsPointXY):
         self.dockwidget.doubleSpinBoxOriginLatitude.setValue(point.x())
         self.dockwidget.doubleSpinBoxOriginLongitude.setValue(point.y())
         self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
         self.dockwidget.show()
+
+    def formChanged(self):
+        if self.dockwidget.lineEditLayerName.text():
+            self.dockwidget.pushButtonPreview.setEnabled(True)
+        else:
+            self.dockwidget.pushButtonPreview.setEnabled(False)

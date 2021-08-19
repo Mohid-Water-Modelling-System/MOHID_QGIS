@@ -27,7 +27,7 @@ Once activated, a new plugin button should appear in the Toolbar.
 ## Task list
 
 - [x] Regular grid creator
-- [ ] Variable spaced grid creator
+- [x] Variable spaced grid creator
 - [x] Set coordinates with mouse capture
 - [x] Dock widget
 - [ ] Read grid from .grd file

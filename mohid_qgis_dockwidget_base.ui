@@ -40,13 +40,22 @@
                                 </item>
                                 <item row="8" column="2">
                                     <widget class="QPushButton" name="pushButtonPreview">
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
                                         <property name="text">
                                             <string>Preview</string>
+                                        </property>
+                                        <property name="checkable">
+                                            <bool>false</bool>
                                         </property>
                                     </widget>
                                 </item>
                                 <item row="8" column="4">
                                     <widget class="QPushButton" name="pushButtonSave">
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
                                         <property name="text">
                                             <string>Save</string>
                                         </property>
@@ -239,10 +248,10 @@
                                             <item row="5" column="1" colspan="3">
                                                 <widget class="QDoubleSpinBox" name="doubleSpinBoxAngle">
                                                     <property name="minimum">
-                                                        <number>-999</number>
+                                                        <double>-999.000000000000000</double>
                                                     </property>
                                                     <property name="maximum">
-                                                        <number>999</number>
+                                                        <double>999.000000000000000</double>
                                                     </property>
                                                 </widget>
                                             </item>
@@ -315,6 +324,9 @@
                                                         </property>
                                                         <item row="2" column="4">
                                                             <widget class="QPushButton" name="pushButtonColumnsAdd">
+                                                                <property name="visible">
+                                                                    <bool>false</bool>
+                                                                </property>
                                                                 <property name="text">
                                                                     <string>Add</string>
                                                                 </property>
@@ -322,6 +334,9 @@
                                                         </item>
                                                         <item row="3" column="4">
                                                             <widget class="QPushButton" name="pushButtonRowsAdd">
+                                                                <property name="visible">
+                                                                    <bool>false</bool>
+                                                                </property>
                                                                 <property name="text">
                                                                     <string>Add</string>
                                                                 </property>
