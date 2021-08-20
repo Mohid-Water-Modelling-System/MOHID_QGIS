@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
-from qgis.PyQt.QtGui import QIcon, QDoubleValidator, QIntValidator
+from qgis.PyQt.QtGui import QIcon, QDoubleValidator, QIntValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -36,6 +36,7 @@ from .variable_spaced_grid import VariableSpacedGrid
 from .regular_grid import RegularGrid
 from qgis.core import QgsProject, QgsPointXY
 from .capture_point_tool import CapturePointTool
+from .not_empty_validator import NotEmptyValidator
 
 
 class MohidPlugin:
@@ -244,27 +245,7 @@ class MohidPlugin:
             self.dockwidget.toolButtonCapturePoint.clicked.connect(
                 self.capturePointClicked)
 
-            doubleValidator = QDoubleValidator(-999999999, 999999999, 9)
-            self.dockwidget.lineEditOriginLatitude.setValidator(
-                doubleValidator)
-            self.dockwidget.lineEditOriginLongitude.setValidator(
-                doubleValidator)
-            self.dockwidget.lineEditAngle.setValidator(doubleValidator)
-
-            doubleValidatorSpacing = QDoubleValidator(
-                0.000000001, 999999999, 9)
-            self.dockwidget.lineEditRegularColumnsSpacing.setValidator(
-                doubleValidatorSpacing)
-            self.dockwidget.lineEditRegularRowsSpacing.setValidator(
-                doubleValidatorSpacing)
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.setValidator(
-                doubleValidatorSpacing)
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setValidator(
-                doubleValidatorSpacing)
-            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setValidator(
-                doubleValidatorSpacing)
-            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setValidator(
-                doubleValidatorSpacing)
+            self.setValidators()
 
             self.dockwidget.lineEditOriginLatitude.textChanged.connect(
                 self.formChanged)
@@ -355,29 +336,50 @@ class MohidPlugin:
         self.dockwidget.show()
 
     def formChanged(self):
-        if not self.dockwidget.lineEditOriginLatitude.text():
-            self.dockwidget.pushButtonPreview.setEnabled(False)
-        elif not self.dockwidget.lineEditOriginLongitude.text():
-            self.dockwidget.pushButtonPreview.setEnabled(False)
-        elif not self.dockwidget.lineEditAngle.text():
-            self.dockwidget.pushButtonPreview.setEnabled(False)
-        elif not self.dockwidget.lineEditLayerName.text():
-            self.dockwidget.pushButtonPreview.setEnabled(False)
-        elif self.dockwidget.radioButtonRegular.isChecked():
-            if not self.dockwidget.lineEditRegularColumnsSpacing.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            elif not self.dockwidget.lineEditRegularRowsSpacing.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            else:
-                self.dockwidget.pushButtonPreview.setEnabled(True)
+        formIsFilled = True
+        lineEdits1 = [self.dockwidget.lineEditOriginLatitude,
+                      self.dockwidget.lineEditOriginLongitude,
+                      self.dockwidget.lineEditAngle,
+                      self.dockwidget.lineEditLayerName]
+
+        if self.dockwidget.radioButtonRegular.isChecked():
+            lineEdits2 = [self.dockwidget.lineEditRegularColumnsSpacing,
+                          self.dockwidget.lineEditRegularRowsSpacing]
         elif self.dockwidget.radioButtonVariableSpaced.isChecked():
-            if not self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            elif not self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            elif not self.dockwidget.lineEditVariableSpacedRowsSpacingStart.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            elif not self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.text():
-                self.dockwidget.pushButtonPreview.setEnabled(False)
-            else:
-                self.dockwidget.pushButtonPreview.setEnabled(True)
+            lineEdits2 = [self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
+                          self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                          self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
+                          self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
+
+        lineEdits = lineEdits1 + lineEdits2
+
+        for lineEdit in lineEdits:
+            if not lineEdit.hasAcceptableInput():
+                formIsFilled = False
+                break
+
+        self.dockwidget.pushButtonPreview.setEnabled(formIsFilled)
+
+    def setValidators(self):
+        lineEdits = [self.dockwidget.lineEditOriginLatitude,
+                     self.dockwidget.lineEditOriginLongitude,
+                     self.dockwidget.lineEditAngle]
+
+        for lineEdit in lineEdits:
+            validator = QDoubleValidator(lineEdit)
+            lineEdit.setValidator(validator)
+
+        lineEdits = [self.dockwidget.lineEditRegularColumnsSpacing,
+                     self.dockwidget.lineEditRegularRowsSpacing,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
+
+        for lineEdit in lineEdits:
+            validator = QDoubleValidator(0.000000001, 999999999, 9, lineEdit)
+            lineEdit.setValidator(validator)
+        
+        lineEdit = self.dockwidget.lineEditLayerName
+        validator = NotEmptyValidator(lineEdit)
+        lineEdit.setValidator(validator)
