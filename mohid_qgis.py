@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
-from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon, QDoubleValidator, QIntValidator
 from qgis.PyQt.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -243,6 +243,47 @@ class MohidPlugin:
                 QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
             self.dockwidget.toolButtonCapturePoint.clicked.connect(
                 self.capturePointClicked)
+
+            doubleValidator = QDoubleValidator(-999999999, 999999999, 9)
+            self.dockwidget.lineEditOriginLatitude.setValidator(
+                doubleValidator)
+            self.dockwidget.lineEditOriginLongitude.setValidator(
+                doubleValidator)
+            self.dockwidget.lineEditAngle.setValidator(doubleValidator)
+
+            doubleValidatorSpacing = QDoubleValidator(
+                0.000000001, 999999999, 9)
+            self.dockwidget.lineEditRegularColumnsSpacing.setValidator(
+                doubleValidatorSpacing)
+            self.dockwidget.lineEditRegularRowsSpacing.setValidator(
+                doubleValidatorSpacing)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.setValidator(
+                doubleValidatorSpacing)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setValidator(
+                doubleValidatorSpacing)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setValidator(
+                doubleValidatorSpacing)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setValidator(
+                doubleValidatorSpacing)
+
+            self.dockwidget.lineEditOriginLatitude.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditOriginLongitude.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditAngle.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditRegularColumnsSpacing.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditRegularRowsSpacing.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.textChanged.connect(
+                self.formChanged)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.textChanged.connect(
+                self.formChanged)
             self.dockwidget.lineEditLayerName.textChanged.connect(
                 self.formChanged)
 
@@ -253,24 +294,30 @@ class MohidPlugin:
 
     def previewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
-        latitude = self.dockwidget.doubleSpinBoxOriginLatitude.value()
-        longitude = self.dockwidget.doubleSpinBoxOriginLongitude.value()
+        latitude = float(self.dockwidget.lineEditOriginLatitude.text())
+        longitude = float(self.dockwidget.lineEditOriginLongitude.text())
         origin = Point(latitude, longitude)
-        angle = self.dockwidget.doubleSpinBoxAngle.value()
+        angle = float(self.dockwidget.lineEditAngle.text())
         if self.dockwidget.radioButtonRegular.isChecked():
             nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
             nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
-            columnsSpacing = self.dockwidget.doubleSpinBoxRegularColumnsSpacing.value()
-            rowsSpacing = self.dockwidget.doubleSpinBoxRegularRowsSpacing.value()
+            columnsSpacing = float(
+                self.dockwidget.lineEditRegularColumnsSpacing.text())
+            rowsSpacing = float(
+                self.dockwidget.lineEditRegularRowsSpacing.text())
             grid = RegularGrid(crs, origin, nColumns, nRows,
                                columnsSpacing, rowsSpacing, angle)
         elif self.dockwidget.radioButtonVariableSpaced.isChecked():
             nColumns = self.dockwidget.spinBoxVariableSpacedColumnsQuantity.value()
             nRows = self.dockwidget.spinBoxVariableSpacedRowsQuantity.value()
-            columnsSpacingStart = self.dockwidget.doubleSpinBoxVariableSpacedColumnsSpacingStart.value()
-            columnsSpacingEnd = self.dockwidget.doubleSpinBoxVariableSpacedColumnsSpacingEnd.value()
-            rowsSpacingStart = self.dockwidget.doubleSpinBoxVariableSpacedRowsSpacingStart.value()
-            rowsSpacingEnd = self.dockwidget.doubleSpinBoxVariableSpacedRowsSpacingEnd.value()
+            columnsSpacingStart = float(
+                self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.text())
+            columnsSpacingEnd = float(
+                self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.text())
+            rowsSpacingStart = float(
+                self.dockwidget.lineEditVariableSpacedRowsSpacingStart.text())
+            rowsSpacingEnd = float(
+                self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.text())
             grid = VariableSpacedGrid(crs, origin, nColumns, nRows, columnsSpacingStart, columnsSpacingEnd,
                                       rowsSpacingStart, rowsSpacingEnd, angle)
         layerName = self.dockwidget.lineEditLayerName.text()
@@ -279,12 +326,14 @@ class MohidPlugin:
 
     def regularToggled(self):
         if self.dockwidget.radioButtonRegular.isChecked():
+            self.formChanged()
             self.dockwidget.widgetRegular.setVisible(True)
         else:
             self.dockwidget.widgetRegular.setVisible(False)
 
     def variableSpacedToggled(self):
         if self.dockwidget.radioButtonVariableSpaced.isChecked():
+            self.formChanged()
             self.dockwidget.widgetVariableSpaced.setVisible(True)
         else:
             self.dockwidget.widgetVariableSpaced.setVisible(False)
@@ -300,13 +349,35 @@ class MohidPlugin:
             self.capturePointTool.canvasClicked.connect(self.canvasClicked)
 
     def canvasClicked(self, point: QgsPointXY):
-        self.dockwidget.doubleSpinBoxOriginLatitude.setValue(point.x())
-        self.dockwidget.doubleSpinBoxOriginLongitude.setValue(point.y())
+        self.dockwidget.lineEditOriginLatitude.setText(str(point.x()))
+        self.dockwidget.lineEditOriginLongitude.setText(str(point.y()))
         self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
         self.dockwidget.show()
 
     def formChanged(self):
-        if self.dockwidget.lineEditLayerName.text():
-            self.dockwidget.pushButtonPreview.setEnabled(True)
-        else:
+        if not self.dockwidget.lineEditOriginLatitude.text():
             self.dockwidget.pushButtonPreview.setEnabled(False)
+        elif not self.dockwidget.lineEditOriginLongitude.text():
+            self.dockwidget.pushButtonPreview.setEnabled(False)
+        elif not self.dockwidget.lineEditAngle.text():
+            self.dockwidget.pushButtonPreview.setEnabled(False)
+        elif not self.dockwidget.lineEditLayerName.text():
+            self.dockwidget.pushButtonPreview.setEnabled(False)
+        elif self.dockwidget.radioButtonRegular.isChecked():
+            if not self.dockwidget.lineEditRegularColumnsSpacing.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            elif not self.dockwidget.lineEditRegularRowsSpacing.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            else:
+                self.dockwidget.pushButtonPreview.setEnabled(True)
+        elif self.dockwidget.radioButtonVariableSpaced.isChecked():
+            if not self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            elif not self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            elif not self.dockwidget.lineEditVariableSpacedRowsSpacingStart.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            elif not self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.text():
+                self.dockwidget.pushButtonPreview.setEnabled(False)
+            else:
+                self.dockwidget.pushButtonPreview.setEnabled(True)
