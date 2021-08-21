@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
-from qgis.PyQt.QtGui import QIcon, QDoubleValidator, QIntValidator, QRegExpValidator
+from qgis.PyQt.QtGui import QIcon, QDoubleValidator
 from qgis.PyQt.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -38,6 +38,7 @@ from .regular_grid import RegularGrid
 from qgis.core import QgsProject, QgsPointXY
 from .capture_point_tool import CapturePointTool
 from .not_empty_validator import NotEmptyValidator
+from .greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
 
 
 class MohidPlugin:
@@ -284,7 +285,7 @@ class MohidPlugin:
                      self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
 
         for lineEdit in lineEdits:
-            validator = QDoubleValidator(0.000000001, 999999999, 9, lineEdit)
+            validator =  GreaterThanZeroDoubleValidator(lineEdit)
             lineEdit.setValidator(validator)
 
         lineEdit = self.dockwidget.lineEditLayerName
