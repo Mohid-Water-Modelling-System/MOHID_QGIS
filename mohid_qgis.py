@@ -350,16 +350,28 @@ class MohidPlugin:
     def radioButtonRegularToggled(self):
         if self.dockwidget.radioButtonRegular.isChecked():
             self.formChanged()
-            self.dockwidget.widgetRegular.setVisible(True)
+            self.dockwidget.labelRegularSpacing.setVisible(True)
+            self.dockwidget.lineEditRegularRowsSpacing.setVisible(True)
+            self.dockwidget.lineEditRegularColumnsSpacing.setVisible(True)
         else:
-            self.dockwidget.widgetRegular.setVisible(False)
+            self.dockwidget.labelRegularSpacing.setVisible(False)
+            self.dockwidget.lineEditRegularRowsSpacing.setVisible(False)
+            self.dockwidget.lineEditRegularColumnsSpacing.setVisible(False)
 
     def radioButtonVariableSpacedToggled(self):
         if self.dockwidget.radioButtonVariableSpaced.isChecked():
             self.formChanged()
-            self.dockwidget.widgetVariableSpaced.setVisible(True)
+            self.dockwidget.labelSpacingRange.setVisible(True)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.setVisible(True)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setVisible(True)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setVisible(True)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setVisible(True)
         else:
-            self.dockwidget.widgetVariableSpaced.setVisible(False)
+            self.dockwidget.labelSpacingRange.setVisible(False)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.setVisible(False)
+            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setVisible(False)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setVisible(False)
+            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setVisible(False)
 
     def pushButtonPreviewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
@@ -367,9 +379,9 @@ class MohidPlugin:
         longitude = float(self.dockwidget.lineEditOriginLongitude.text())
         origin = Point(latitude, longitude)
         angle = float(self.dockwidget.lineEditAngle.text())
+        nColumns = self.dockwidget.spinBoxColumnsQuantity.value()
+        nRows = self.dockwidget.spinBoxRowsQuantity.value()
         if self.dockwidget.radioButtonRegular.isChecked():
-            nColumns = self.dockwidget.spinBoxRegularColumnsQuantity.value()
-            nRows = self.dockwidget.spinBoxRegularRowsQuantity.value()
             columnsSpacing = float(
                 self.dockwidget.lineEditRegularColumnsSpacing.text())
             rowsSpacing = float(
@@ -377,8 +389,6 @@ class MohidPlugin:
             grid = RegularGrid(crs, origin, nColumns, nRows,
                                columnsSpacing, rowsSpacing, angle)
         elif self.dockwidget.radioButtonVariableSpaced.isChecked():
-            nColumns = self.dockwidget.spinBoxVariableSpacedColumnsQuantity.value()
-            nRows = self.dockwidget.spinBoxVariableSpacedRowsQuantity.value()
             columnsSpacingStart = float(
                 self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.text())
             columnsSpacingEnd = float(
