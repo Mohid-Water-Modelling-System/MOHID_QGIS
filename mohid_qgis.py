@@ -80,8 +80,6 @@ class MohidPlugin:
         self.pluginIsActive = False
         self.dockwidget = None
 
-        self.capturePointTool = None
-
     # noinspection PyMethodMayBeStatic
 
     def tr(self, message):
@@ -197,6 +195,9 @@ class MohidPlugin:
         # when closing the docked window:
         # self.dockwidget = None
 
+        if self.dockwidget.toolButtonCapturePoint.isChecked():
+            self.dockwidget.toolButtonCapturePoint.toggle()
+
         self.pluginIsActive = False
 
     def unload(self):
@@ -232,48 +233,133 @@ class MohidPlugin:
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
-            self.dockwidget.pushButtonPreview.clicked.connect(
-                self.previewClicked)
-            self.dockwidget.radioButtonRegular.toggled.connect(
-                self.regularToggled)
-            self.dockwidget.radioButtonVariableSpaced.toggled.connect(
-                self.variableSpacedToggled)
             self.dockwidget.mQgsProjectionSelectionWidget.setCrs(
                 QgsProject.instance().crs())
-            self.dockwidget.toolButtonCapturePoint.setIcon(
-                QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
-            self.dockwidget.toolButtonCapturePoint.clicked.connect(
-                self.capturePointClicked)
 
+            self.setCapturePointTool()
             self.setValidators()
-
-            self.dockwidget.lineEditOriginLatitude.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditOriginLongitude.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditAngle.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditRegularColumnsSpacing.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditRegularRowsSpacing.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.textChanged.connect(
-                self.formChanged)
-            self.dockwidget.lineEditLayerName.textChanged.connect(
-                self.formChanged)
+            self.connectWidgets()
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-    def previewClicked(self):
+    def setCapturePointTool(self):
+        crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
+        self.capturePointTool = CapturePointTool(self.iface.mapCanvas(), crs)
+        self.capturePointTool.setButton(self.dockwidget.toolButtonCapturePoint)
+        self.capturePointTool.canvasClicked.connect(self.canvasClicked)
+        self.dockwidget.toolButtonCapturePoint.setIcon(
+            QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
+        self.dockwidget.toolButtonCapturePoint.toggled.connect(
+            self.toolButtonCapturePointToggled)
+    
+    def toolButtonCapturePointToggled(self):
+        if self.dockwidget.toolButtonCapturePoint.isChecked():
+            self.iface.mapCanvas().setMapTool(self.capturePointTool)
+        else:
+            self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
+
+    def canvasClicked(self, point: QgsPointXY):
+        self.dockwidget.lineEditOriginLatitude.setText(str(point.x()))
+        self.dockwidget.lineEditOriginLongitude.setText(str(point.y()))
+        self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
+    
+    def setValidators(self):
+        lineEdits = [self.dockwidget.lineEditOriginLatitude,
+                     self.dockwidget.lineEditOriginLongitude,
+                     self.dockwidget.lineEditAngle]
+
+        for lineEdit in lineEdits:
+            validator = QDoubleValidator(lineEdit)
+            lineEdit.setValidator(validator)
+
+        lineEdits = [self.dockwidget.lineEditRegularColumnsSpacing,
+                     self.dockwidget.lineEditRegularRowsSpacing,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
+
+        for lineEdit in lineEdits:
+            validator = QDoubleValidator(0.000000001, 999999999, 9, lineEdit)
+            lineEdit.setValidator(validator)
+
+        lineEdit = self.dockwidget.lineEditLayerName
+        validator = NotEmptyValidator(lineEdit)
+        lineEdit.setValidator(validator)
+    
+    def connectWidgets(self):
+        self.dockwidget.mQgsProjectionSelectionWidget.crsChanged.connect(
+            self.mQgsProjectionSelectionWidgetCrsChanged)
+
+        lineEdits = [self.dockwidget.lineEditOriginLatitude,
+                     self.dockwidget.lineEditOriginLongitude,
+                     self.dockwidget.lineEditAngle,
+                     self.dockwidget.lineEditRegularColumnsSpacing,
+                     self.dockwidget.lineEditRegularRowsSpacing,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
+                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd,
+                     self.dockwidget.lineEditLayerName]
+
+        for lineEdit in lineEdits:
+            lineEdit.textChanged.connect(self.formChanged)
+        
+        self.dockwidget.radioButtonRegular.toggled.connect(
+            self.radioButtonRegularToggled)
+        self.dockwidget.radioButtonVariableSpaced.toggled.connect(
+            self.radioButtonVariableSpacedToggled)
+        self.dockwidget.pushButtonPreview.clicked.connect(
+            self.pushButtonPreviewClicked)
+    
+    def mQgsProjectionSelectionWidgetCrsChanged(self):
+        crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
+        self.capturePointTool.setCrs(crs)
+    
+    def formChanged(self):
+        formIsFilled = True
+
+        lineEdits1 = [self.dockwidget.lineEditOriginLatitude,
+                      self.dockwidget.lineEditOriginLongitude,
+                      self.dockwidget.lineEditAngle,
+                      self.dockwidget.lineEditLayerName]
+
+        if self.dockwidget.radioButtonRegular.isChecked():
+            lineEdits2 = [self.dockwidget.lineEditRegularColumnsSpacing,
+                          self.dockwidget.lineEditRegularRowsSpacing]
+        elif self.dockwidget.radioButtonVariableSpaced.isChecked():
+            lineEdits2 = [self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
+                          self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                          self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
+                          self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
+
+        lineEdits = lineEdits1 + lineEdits2
+
+        for lineEdit in lineEdits:
+            if not lineEdit.hasAcceptableInput():
+                formIsFilled = False
+                break
+
+        self.dockwidget.pushButtonPreview.setEnabled(formIsFilled)
+
+    def radioButtonRegularToggled(self):
+        if self.dockwidget.radioButtonRegular.isChecked():
+            self.formChanged()
+            self.dockwidget.widgetRegular.setVisible(True)
+        else:
+            self.dockwidget.widgetRegular.setVisible(False)
+
+    def radioButtonVariableSpacedToggled(self):
+        if self.dockwidget.radioButtonVariableSpaced.isChecked():
+            self.formChanged()
+            self.dockwidget.widgetVariableSpaced.setVisible(True)
+        else:
+            self.dockwidget.widgetVariableSpaced.setVisible(False)
+
+    def pushButtonPreviewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
         latitude = float(self.dockwidget.lineEditOriginLatitude.text())
         longitude = float(self.dockwidget.lineEditOriginLongitude.text())
@@ -304,82 +390,3 @@ class MohidPlugin:
         layerName = self.dockwidget.lineEditLayerName.text()
         layer = grid.toQgsVectorLayer(layerName)
         QgsProject.instance().addMapLayer(layer)
-
-    def regularToggled(self):
-        if self.dockwidget.radioButtonRegular.isChecked():
-            self.formChanged()
-            self.dockwidget.widgetRegular.setVisible(True)
-        else:
-            self.dockwidget.widgetRegular.setVisible(False)
-
-    def variableSpacedToggled(self):
-        if self.dockwidget.radioButtonVariableSpaced.isChecked():
-            self.formChanged()
-            self.dockwidget.widgetVariableSpaced.setVisible(True)
-        else:
-            self.dockwidget.widgetVariableSpaced.setVisible(False)
-
-    def capturePointClicked(self):
-        if(self.iface.mapCanvas().mapTool() is self.capturePointTool):
-            self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
-        else:
-            crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
-            self.capturePointTool = CapturePointTool(
-                self.iface.mapCanvas(), crs)
-            self.iface.mapCanvas().setMapTool(self.capturePointTool)
-            self.capturePointTool.canvasClicked.connect(self.canvasClicked)
-
-    def canvasClicked(self, point: QgsPointXY):
-        self.dockwidget.lineEditOriginLatitude.setText(str(point.x()))
-        self.dockwidget.lineEditOriginLongitude.setText(str(point.y()))
-        self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
-        self.dockwidget.show()
-
-    def formChanged(self):
-        formIsFilled = True
-        lineEdits1 = [self.dockwidget.lineEditOriginLatitude,
-                      self.dockwidget.lineEditOriginLongitude,
-                      self.dockwidget.lineEditAngle,
-                      self.dockwidget.lineEditLayerName]
-
-        if self.dockwidget.radioButtonRegular.isChecked():
-            lineEdits2 = [self.dockwidget.lineEditRegularColumnsSpacing,
-                          self.dockwidget.lineEditRegularRowsSpacing]
-        elif self.dockwidget.radioButtonVariableSpaced.isChecked():
-            lineEdits2 = [self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
-                          self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
-                          self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
-                          self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
-
-        lineEdits = lineEdits1 + lineEdits2
-
-        for lineEdit in lineEdits:
-            if not lineEdit.hasAcceptableInput():
-                formIsFilled = False
-                break
-
-        self.dockwidget.pushButtonPreview.setEnabled(formIsFilled)
-
-    def setValidators(self):
-        lineEdits = [self.dockwidget.lineEditOriginLatitude,
-                     self.dockwidget.lineEditOriginLongitude,
-                     self.dockwidget.lineEditAngle]
-
-        for lineEdit in lineEdits:
-            validator = QDoubleValidator(lineEdit)
-            lineEdit.setValidator(validator)
-
-        lineEdits = [self.dockwidget.lineEditRegularColumnsSpacing,
-                     self.dockwidget.lineEditRegularRowsSpacing,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
-
-        for lineEdit in lineEdits:
-            validator = QDoubleValidator(0.000000001, 999999999, 9, lineEdit)
-            lineEdit.setValidator(validator)
-        
-        lineEdit = self.dockwidget.lineEditLayerName
-        validator = NotEmptyValidator(lineEdit)
-        lineEdit.setValidator(validator)
