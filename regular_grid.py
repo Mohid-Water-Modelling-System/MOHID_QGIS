@@ -7,6 +7,15 @@ from .grid import Grid
 class RegularGrid(Grid):
     def __init__(self, crs: QgsCoordinateReferenceSystem, origin: Point, nCols: int, nRows: int,
                  colSpacing: float, rowSpacing: float, angle: float):
+        
+        if nCols < 1 :
+            raise Exception("Number of columns lower than 1")
+        elif nRows < 1 :
+            raise Exception("Number of rows lower than 1")
+        elif colSpacing <= 0 :
+            raise Exception("Column spacing not greater than 0")
+        elif rowSpacing <= 0 :
+            raise Exception("Row spacing not greater than 0")
 
         xO = origin.x()
         yO = origin.y()

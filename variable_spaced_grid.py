@@ -8,6 +8,19 @@ class VariableSpacedGrid(Grid):
     def __init__(self, crs: QgsCoordinateReferenceSystem, origin: Point, nCols: int, nRows: int,
                  colSpacingStart: float, colSpacingEnd: float,
                  rowSpacingStart: float, rowSpacingEnd: float, angle: float):
+        
+        if nCols < 1 :
+            raise Exception("Number of columns lower than 1")
+        elif nRows < 1 :
+            raise Exception("Number of rows lower than 1")
+        elif colSpacingStart <= 0 :
+            raise Exception("Column spacing start not greater than 0")
+        elif colSpacingEnd <= 0 :
+            raise Exception("Column spacing end not greater than 0")
+        elif rowSpacingStart <= 0 :
+            raise Exception("Row spacing start not greater than 0")
+        elif rowSpacingEnd <= 0 :
+            raise Exception("Row spacing end not greater than 0")
 
         xO = origin.x()
         yO = origin.y()
