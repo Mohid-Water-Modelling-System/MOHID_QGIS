@@ -3,6 +3,7 @@ from .cell import Cell
 
 
 class Grid:
+    MohidGridLayer = "MohidGridLayer"
     def __init__(self, crs: QgsCoordinateReferenceSystem, cells: list[list[Cell]]):
         self.setCrs(crs)
         self.setCells(cells)
@@ -35,5 +36,5 @@ class Grid:
         provider.addFeatures(features)
         layer.updateExtents()
 
-        layer.setCustomProperty("grid", True)
+        layer.setCustomProperty(Grid.MohidGridLayer, True)
         return layer

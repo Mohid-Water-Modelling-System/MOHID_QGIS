@@ -11,8 +11,11 @@ class CapturePointTool(QgsMapToolEmitPoint):
     def __init__(self, canvas: QgsMapCanvas, crs: QgsCoordinateReferenceSystem):
         QgsMapToolEmitPoint.__init__(self, canvas)
         self.setCrs(crs)
-        self.setCursor(QCursor(
-            QIcon(':images/themes/default/cursors/mCapturePoint.svg').pixmap(48, 48)))
+        
+        icon = QIcon(':images/themes/default/cursors/mCapturePoint.svg')
+        pixmap = icon.pixmap(48, 48)
+        cursor = QCursor(pixmap)
+        self.setCursor(cursor)
 
     def setCrs(self, crs: QgsCoordinateReferenceSystem):
         self.crs = crs

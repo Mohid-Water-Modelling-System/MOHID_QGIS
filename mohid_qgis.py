@@ -32,6 +32,7 @@ from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 
 from .point import Point
+from .grid import Grid
 from .variable_spaced_grid import VariableSpacedGrid
 from .regular_grid import RegularGrid
 from qgis.core import QgsProject, QgsPointXY
@@ -392,7 +393,7 @@ class MohidPlugin:
 
         layersWithSameName = QgsProject.instance().mapLayersByName(layerName)
         for layerWithSameName in layersWithSameName:
-            if layerWithSameName.customProperty("grid"):
+            if layerWithSameName.customProperty(Grid.MohidGridLayer):
                 QgsProject.instance().removeMapLayer(layerWithSameName.id())
         
         QgsProject.instance().addMapLayer(layer)
