@@ -254,7 +254,7 @@ class MohidPlugin:
             QIcon(":images/themes/default/cursors/mCapturePoint.svg"))
         self.dockwidget.toolButtonCapturePoint.toggled.connect(
             self.toolButtonCapturePointToggled)
-    
+
     def toolButtonCapturePointToggled(self):
         if self.dockwidget.toolButtonCapturePoint.isChecked():
             self.iface.mapCanvas().setMapTool(self.capturePointTool)
@@ -265,7 +265,7 @@ class MohidPlugin:
         self.dockwidget.lineEditOriginLatitude.setText(str(point.x()))
         self.dockwidget.lineEditOriginLongitude.setText(str(point.y()))
         self.iface.mapCanvas().unsetMapTool(self.capturePointTool)
-    
+
     def setValidators(self):
         lineEdits = [self.dockwidget.lineEditOriginLatitude,
                      self.dockwidget.lineEditOriginLongitude,
@@ -289,7 +289,7 @@ class MohidPlugin:
         lineEdit = self.dockwidget.lineEditLayerName
         validator = NotEmptyValidator(lineEdit)
         lineEdit.setValidator(validator)
-    
+
     def connectWidgets(self):
         self.dockwidget.mQgsProjectionSelectionWidget.crsChanged.connect(
             self.mQgsProjectionSelectionWidgetCrsChanged)
@@ -307,18 +307,18 @@ class MohidPlugin:
 
         for lineEdit in lineEdits:
             lineEdit.textChanged.connect(self.formChanged)
-        
+
         self.dockwidget.radioButtonRegular.toggled.connect(
             self.radioButtonRegularToggled)
         self.dockwidget.radioButtonVariableSpaced.toggled.connect(
             self.radioButtonVariableSpacedToggled)
         self.dockwidget.pushButtonPreview.clicked.connect(
             self.pushButtonPreviewClicked)
-    
+
     def mQgsProjectionSelectionWidgetCrsChanged(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
         self.capturePointTool.setCrs(crs)
-    
+
     def formChanged(self):
         formIsFilled = True
 
@@ -389,4 +389,10 @@ class MohidPlugin:
                                       rowsSpacingStart, rowsSpacingEnd, angle)
         layerName = self.dockwidget.lineEditLayerName.text()
         layer = grid.toQgsVectorLayer(layerName)
+
+        layersWithSameName = QgsProject.instance().mapLayersByName(layerName)
+        for layerWithSameName in layersWithSameName:
+            if layerWithSameName.customProperty("grid"):
+                QgsProject.instance().removeMapLayer(layerWithSameName.id())
+        
         QgsProject.instance().addMapLayer(layer)

@@ -34,4 +34,6 @@ class Grid:
                 features += [feature]
         provider.addFeatures(features)
         layer.updateExtents()
+
+        layer.setCustomProperty("grid", True)
         return layer
