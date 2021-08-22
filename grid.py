@@ -23,6 +23,17 @@ class Grid:
     def toQgsVectorLayer(self, layerName: str) -> QgsVectorLayer:
         crsId = self.getCrs().geographicCrsAuthId()
         layer = QgsVectorLayer("Polygon?crs=" + crsId, layerName, "memory")
+        self.populateQgsVectorLayer(layer)
+        layer.setCustomProperty(Grid.MohidGridLayer, True)
+        return layer
+    
+    def updateQgsVectorLayer(self, layer: QgsVectorLayer):
+        provider = layer.dataProvider()
+        provider.truncate()
+        self.populateQgsVectorLayer(layer)
+        layer.reload()
+    
+    def populateQgsVectorLayer(self, layer: QgsVectorLayer):
         provider = layer.dataProvider()
         features = []
         cells = self.getCells()
@@ -35,6 +46,3 @@ class Grid:
                 features += [feature]
         provider.addFeatures(features)
         layer.updateExtents()
-
-        layer.setCustomProperty(Grid.MohidGridLayer, True)
-        return layer

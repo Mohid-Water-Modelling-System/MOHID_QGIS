@@ -400,11 +400,13 @@ class MohidPlugin:
             grid = VariableSpacedGrid(crs, origin, nColumns, nRows, columnsSpacingStart, columnsSpacingEnd,
                                       rowsSpacingStart, rowsSpacingEnd, angle)
         layerName = self.dockwidget.lineEditLayerName.text()
-        layer = grid.toQgsVectorLayer(layerName)
-
-        layersWithSameName = QgsProject.instance().mapLayersByName(layerName)
-        for layerWithSameName in layersWithSameName:
-            if layerWithSameName.customProperty(Grid.MohidGridLayer):
-                QgsProject.instance().removeMapLayer(layerWithSameName.id())
         
-        QgsProject.instance().addMapLayer(layer)
+        layersWithSameName = QgsProject.instance().mapLayersByName(layerName)
+        if layersWithSameName:
+            for layerWithSameName in layersWithSameName:
+                if layerWithSameName.customProperty(Grid.MohidGridLayer):
+                    grid.updateQgsVectorLayer(layerWithSameName)
+                    break
+        else:
+            layer = grid.toQgsVectorLayer(layerName)
+            QgsProject.instance().addMapLayer(layer)
