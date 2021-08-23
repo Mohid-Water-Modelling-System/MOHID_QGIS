@@ -366,12 +366,20 @@ class MohidPlugin:
             self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setVisible(True)
             self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setVisible(True)
             self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setVisible(True)
+            self.dockwidget.labelLayout.setVisible(True)
+            self.dockwidget.tableWidgetLayout.setVisible(True)
+            self.dockwidget.toolButtonAddRows.setVisible(True)
+            self.dockwidget.toolButtonAddColumns.setVisible(True)
         else:
             self.dockwidget.labelSpacingRange.setVisible(False)
             self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.setVisible(False)
             self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.setVisible(False)
             self.dockwidget.lineEditVariableSpacedRowsSpacingStart.setVisible(False)
             self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.setVisible(False)
+            self.dockwidget.labelLayout.setVisible(False)
+            self.dockwidget.tableWidgetLayout.setVisible(False)
+            self.dockwidget.toolButtonAddRows.setVisible(False)
+            self.dockwidget.toolButtonAddColumns.setVisible(False)
 
     def pushButtonPreviewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
