@@ -2,43 +2,45 @@ from qgis.core import QgsCoordinateReferenceSystem
 from .point import Point
 from .cell import Cell
 from .grid import Grid
+from .layout import Layout
 
 
 class VariableSpacedGrid(Grid):
-    def __init__(self, crs: QgsCoordinateReferenceSystem, origin: Point, nCols: int, nRows: int,
-                 colSpacingStart: float, colSpacingEnd: float,
-                 rowSpacingStart: float, rowSpacingEnd: float, angle: float):
+    def __init__(self, crs: QgsCoordinateReferenceSystem, origin: Point, angle: float, layout: Layout):
         
-        if nCols < 1 :
-            raise Exception("Number of columns lower than 1")
-        elif nRows < 1 :
-            raise Exception("Number of rows lower than 1")
-        elif colSpacingStart <= 0 :
-            raise Exception("Column spacing start not greater than 0")
-        elif colSpacingEnd <= 0 :
-            raise Exception("Column spacing end not greater than 0")
-        elif rowSpacingStart <= 0 :
-            raise Exception("Row spacing start not greater than 0")
-        elif rowSpacingEnd <= 0 :
-            raise Exception("Row spacing end not greater than 0")
-
+        if not layout.isValid():
+            raise Exception("Variable Spaced Grid Layout is not valid")
+        
         xO = origin.x()
         yO = origin.y()
-        xVariation = (colSpacingEnd - colSpacingStart) / nCols
-        yVariation = (rowSpacingEnd - rowSpacingStart) / nRows
+
+        colLayout = layout.getCols()
+        rowLayout = layout.getRows()
+
+        nRows = 0
+        for rl in rowLayout:
+            nRows += rl.getN()
+
+        nCols = 0
+        for cl in colLayout:
+            nCols += cl.getN()
 
         points = []
         yOffset = 0
-        for r in range(nRows + 1):
-            row = []
-            xOffset = 0
-            for c in range(nCols + 1):
-                point = Point(xO + xOffset, yO + yOffset)
-                point.rotate(origin, angle)
-                row.append(point)
-                xOffset += colSpacingStart + (c * xVariation)
-            points.append(row)
-            yOffset += rowSpacingStart + (r * yVariation)
+        for rl in rowLayout:
+            yVariation = (rl.getSpacingEnd() - rl.getSpacingStart()) / rl.getN()
+            for r in range(rl.getN() + 1):
+                row = []
+                xOffset = 0
+                for cl in colLayout:
+                    xVariation = (cl.getSpacingEnd() - cl.getSpacingStart()) / cl.getN()
+                    for c in range(cl.getN() + 1):
+                        point = Point(xO + xOffset, yO + yOffset)
+                        point.rotate(origin, angle)
+                        row.append(point)
+                        xOffset += cl.getSpacingStart() + (c * xVariation)
+                points.append(row)
+                yOffset += rl.getSpacingStart() + (r * yVariation)
 
         cells = []
         for r in range(nRows):
