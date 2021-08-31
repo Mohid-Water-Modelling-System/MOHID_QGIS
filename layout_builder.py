@@ -26,7 +26,7 @@ class LayoutBuilder(QObject):
         self.setLayout(layout)
 
     def setTableWidget(self, t: QTableWidget):
-        labels = ["Quantity", "Type", "Spacing"]
+        labels = ["Quantity", "Type", "Spacing", ""]
         columnCount = len(labels)
         t.setColumnCount(columnCount)
         t.setHorizontalHeaderLabels(labels)
@@ -52,10 +52,16 @@ class LayoutBuilder(QObject):
                  QTableWidgetItem(str(spacingStart) + " to " + str(spacingEnd))]
 
         table.insertRow(rowCount)
-        for col in range(colCount):
+        for col in range(colCount - 1):
             item = items[col]
             table.setItem(rowCount, col, item)
-    
+        
+        b = QToolButton(table)
+        icon = QIcon(":images/themes/default/mActionRemove.svg")
+        b.setIcon(icon)
+        table.setCellWidget(rowCount, colCount - 1, b)
+        table.resizeColumnToContents(colCount - 1)
+
     def setSpinBoxRowQuantity(self, s: QSpinBox):
         self.__spinBoxRowQuantity = s
     

@@ -40,7 +40,6 @@ from .capture_point_tool import CapturePointTool
 from .not_empty_validator import NotEmptyValidator
 from .greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
 from .layout_builder import LayoutBuilder
-from .layout import Layout
 
 class MohidPlugin:
     """QGIS Plugin Implementation."""
