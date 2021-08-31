@@ -39,8 +39,8 @@ from qgis.core import QgsProject, QgsPointXY
 from .capture_point_tool import CapturePointTool
 from .not_empty_validator import NotEmptyValidator
 from .greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
+from .layout_builder import LayoutBuilder
 from .layout import Layout
-
 
 class MohidPlugin:
     """QGIS Plugin Implementation."""
@@ -244,24 +244,29 @@ class MohidPlugin:
             self.setValidators()
             self.connectWidgets()
 
-            self.__layout = Layout(self.dockwidget.tableWidgetLayout)
+            layoutBuilder = LayoutBuilder(self.dockwidget.tableWidgetLayout,
+                                          self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity,
+                                          self.dockwidget.lineEditVariableSpacedColumnsSpacingStart, self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
+                                          self.dockwidget.lineEditVariableSpacedRowsSpacingStart, self.dockwidget.lineEditVariableSpacedRowsSpacingEnd,
+                                          self.dockwidget.toolButtonAddColumns, self.dockwidget.toolButtonAddRows)
+            layoutBuilder.layoutChanged.connect(self.formChanged)
+            self.setLayoutBuilder(layoutBuilder)
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+    
+    def setLayoutBuilder(self, l: LayoutBuilder):
+        self.__layoutBuilder = l
+    
+    def getLayoutBuilder(self) -> LayoutBuilder:
+        return self.__layoutBuilder
 
     def setIcons(self):
-        icons = [QIcon(":images/themes/default/cursors/mCapturePoint.svg"),
-                 QIcon(":images/themes/default/mActionAdd.svg"),
-                 QIcon(":images/themes/default/mActionAdd.svg")]
-
-        buttons = [self.dockwidget.toolButtonCapturePoint,
-                   self.dockwidget.toolButtonAddRows,
-                   self.dockwidget.toolButtonAddColumns]
-
-        for button, icon in zip(buttons, icons):
-            button.setIcon(icon)
+        icon = QIcon(":images/themes/default/cursors/mCapturePoint.svg")
+        button = self.dockwidget.toolButtonCapturePoint
+        button.setIcon(icon)
 
     def setCapturePointTool(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
@@ -292,11 +297,7 @@ class MohidPlugin:
             lineEdit.setValidator(validator)
 
         lineEdits = [self.dockwidget.lineEditRegularColumnsSpacing,
-                     self.dockwidget.lineEditRegularRowsSpacing,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
+                     self.dockwidget.lineEditRegularRowsSpacing]
 
         for lineEdit in lineEdits:
             validator = GreaterThanZeroDoubleValidator(lineEdit)
@@ -315,10 +316,6 @@ class MohidPlugin:
                      self.dockwidget.lineEditAngle,
                      self.dockwidget.lineEditRegularColumnsSpacing,
                      self.dockwidget.lineEditRegularRowsSpacing,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd,
                      self.dockwidget.lineEditLayerName]
 
         for lineEdit in lineEdits:
@@ -330,10 +327,6 @@ class MohidPlugin:
             self.radioButtonVariableSpacedToggled)
         self.dockwidget.pushButtonPreview.clicked.connect(
             self.pushButtonPreviewClicked)
-        self.dockwidget.toolButtonAddColumns.clicked.connect(
-            self.toolButtonAddColumnsClicked)
-        self.dockwidget.toolButtonAddRows.clicked.connect(
-            self.toolButtonAddRowsClicked)
 
     def mQgsProjectionSelectionWidgetCrsChanged(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
@@ -341,8 +334,6 @@ class MohidPlugin:
 
     def formChanged(self):
         self.updatePushButtonPreview()
-        self.updateToolButtonAddColumns()
-        self.updateToolButtonAddRows()
 
     def updatePushButtonPreview(self):
         enabled = True
@@ -366,36 +357,12 @@ class MohidPlugin:
                         enabled = False
                         break
             elif self.dockwidget.radioButtonVariableSpaced.isChecked():
-                if not self.__layout.isValid():
+                layout_builder = self.getLayoutBuilder()
+                layout = layout_builder.getLayout()
+                if not layout.isValid():
                     enabled = False
 
         self.dockwidget.pushButtonPreview.setEnabled(enabled)
-
-    def updateToolButtonAddColumns(self):
-        enabled = True
-
-        lineEdits = [self.dockwidget.lineEditVariableSpacedColumnsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd]
-
-        for lineEdit in lineEdits:
-            if not lineEdit.hasAcceptableInput():
-                enabled = False
-                break
-
-        self.dockwidget.toolButtonAddColumns.setEnabled(enabled)
-
-    def updateToolButtonAddRows(self):
-        enabled = True
-
-        lineEdits = [self.dockwidget.lineEditVariableSpacedRowsSpacingStart,
-                     self.dockwidget.lineEditVariableSpacedRowsSpacingEnd]
-
-        for lineEdit in lineEdits:
-            if not lineEdit.hasAcceptableInput():
-                enabled = False
-                break
-
-        self.dockwidget.toolButtonAddRows.setEnabled(enabled)
 
     def radioButtonRegularToggled(self):
         if self.dockwidget.radioButtonRegular.isChecked():
@@ -439,24 +406,6 @@ class MohidPlugin:
             self.dockwidget.toolButtonAddRows.setVisible(False)
             self.dockwidget.toolButtonAddColumns.setVisible(False)
 
-    def toolButtonAddRowsClicked(self):
-        n = self.dockwidget.spinBoxRowsQuantity.value()
-        spacingStart = float(
-            self.dockwidget.lineEditVariableSpacedRowsSpacingStart.text())
-        spacingEnd = float(
-            self.dockwidget.lineEditVariableSpacedRowsSpacingEnd.text())
-        self.__layout.addRows(n, spacingStart, spacingEnd)
-        self.formChanged()
-
-    def toolButtonAddColumnsClicked(self):
-        n = self.dockwidget.spinBoxColumnsQuantity.value()
-        spacingStart = float(
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingStart.text())
-        spacingEnd = float(
-            self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd.text())
-        self.__layout.addCols(n, spacingStart, spacingEnd)
-        self.formChanged()
-
     def pushButtonPreviewClicked(self):
         crs = self.dockwidget.mQgsProjectionSelectionWidget.crs()
         latitude = float(self.dockwidget.lineEditOriginLatitude.text())
@@ -473,7 +422,9 @@ class MohidPlugin:
             grid = RegularGrid(crs, origin, nColumns, nRows,
                                columnsSpacing, rowsSpacing, angle)
         elif self.dockwidget.radioButtonVariableSpaced.isChecked():
-            grid = VariableSpacedGrid(crs, origin, angle, self.__layout)
+            layoutBuilder = self.getLayoutBuilder()
+            layout = layoutBuilder.getLayout()
+            grid = VariableSpacedGrid(crs, origin, angle, layout)
         layerName = self.dockwidget.lineEditLayerName.text()
 
         layersWithSameName = QgsProject.instance().mapLayersByName(layerName)
