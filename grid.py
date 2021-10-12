@@ -1,24 +1,39 @@
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature
-from .cell import Cell
+from .grid_layout import GridLayout
+from .point import Point
 
-
+#TODO: Remove MohidGridLayer string and bind object instance to layer
 class Grid:
     MohidGridLayer = "MohidGridLayer"
-    def __init__(self, crs: QgsCoordinateReferenceSystem, cells: list[list[Cell]]):
+    def __init__(self, crs: QgsCoordinateReferenceSystem, origin: Point, angle: float, layout: GridLayout):
         self.setCrs(crs)
-        self.setCells(cells)
+        self.setOrigin(origin)
+        self.setAngle(angle)
+        self.setLayout(layout)
 
     def setCrs(self, crs: QgsCoordinateReferenceSystem):
         self.__crs = crs
 
     def getCrs(self) -> QgsCoordinateReferenceSystem:
         return self.__crs
+    
+    def setOrigin(self, o: Point):
+        self.__origin = o
 
-    def setCells(self, cells: list[list[Cell]]):
-        self.__cells = cells
+    def getOrigin(self) -> Point:
+        return self.__origin
+    
+    def setAngle(self, a: float):
+        self.__angle = a
 
-    def getCells(self) -> list[list[Cell]]:
-        return self.__cells
+    def getAngle(self) -> float:
+        return self.__angle
+
+    def setLayout(self, l: GridLayout):
+        self.__layout = l
+    
+    def getLayout(self) -> GridLayout:
+        return self.__layout
 
     def toQgsVectorLayer(self, layerName: str) -> QgsVectorLayer:
         crsId = self.getCrs().geographicCrsAuthId()
@@ -36,7 +51,11 @@ class Grid:
     def populateQgsVectorLayer(self, layer: QgsVectorLayer):
         provider = layer.dataProvider()
         features = []
-        cells = self.getCells()
+        
+        layout = self.getLayout()
+        origin = self.getOrigin()
+        angle = self.getAngle()
+        cells = layout.toCells(origin, angle)
 
         for row in cells:
             for cell in row:
