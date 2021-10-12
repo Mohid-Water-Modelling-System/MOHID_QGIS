@@ -1,28 +1,26 @@
 from qgis.PyQt.QtWidgets import QTableWidget, QTableWidgetItem, QToolButton, QSpinBox, QLabel
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from .grid_double_field import GridGreaterThanZeroDoubleField
+from .grid_variable_spacing_field import GridVariableSpacingField
 from .grid_variable_layout import GridVariableLayout
-from .grid_item_layout import GridItemLayout, GridColLayout, GridRowLayout
+from .grid_item_layout import GridColLayout, GridRowLayout
 
 
 class GridVariableLayoutField(QObject):
     filled = pyqtSignal(bool)
 
-    def __init__(self, tableWidget: QTableWidget,
+    def __init__(self, tableWidget: QTableWidget, layoutLabel: QLabel,
                  colQuantityField: QSpinBox, rowQuantityField: QSpinBox,
-                 colSpacingStartField: GridGreaterThanZeroDoubleField, colSpacingEndField: GridGreaterThanZeroDoubleField,
-                 rowSpacingStartField: GridGreaterThanZeroDoubleField, rowSpacingEndField: GridGreaterThanZeroDoubleField,
+                 colSpacingField: GridVariableSpacingField, rowSpacingField: GridVariableSpacingField,
                  toolButtonAddCols: QToolButton, toolButtonAddRows: QToolButton, spacingLabel: QLabel):
         super().__init__()
 
         self.setTableWidget(tableWidget)
+        self.setLayoutLabel(layoutLabel)
         self.setColQuantityField(colQuantityField)
         self.setRowQuantityField(rowQuantityField)
-        self.setColSpacingStartField(colSpacingStartField)
-        self.setColSpacingEndField(colSpacingEndField)
-        self.setRowSpacingStartField(rowSpacingStartField)
-        self.setRowSpacingEndField(rowSpacingEndField)
+        self.setColSpacingField(colSpacingField)
+        self.setRowSpacingField(rowSpacingField)
         self.setToolButtonAddCols(toolButtonAddCols)
         self.setToolButtonAddRows(toolButtonAddRows)
         self.setSpacingLabel(spacingLabel)
@@ -37,6 +35,12 @@ class GridVariableLayoutField(QObject):
 
     def getTableWidget(self) -> QTableWidget:
         return self.__tableWidget
+    
+    def setLayoutLabel(self, l: QLabel):
+        self.__layoutLabel = l
+
+    def getLayoutLabel(self) -> QLabel:
+        return self.__layoutLabel
 
     def addItemToTableWidget(self, n: int, type: str, spacingStart: float, spacingEnd: float):
         if n < 1:
@@ -77,65 +81,27 @@ class GridVariableLayoutField(QObject):
     def getRowQuantityField(self) -> QSpinBox:
         return self.__rowQuantityField
     
-    def setColSpacingStartField(self, f: GridGreaterThanZeroDoubleField):
+    def setColSpacingField(self, f: GridVariableSpacingField):
         f.filled.connect(self.colSpacingFieldFilled)
-        self.__colSpacingStartField = f
+        self.__colSpacingField = f
 
-    def getColSpacingStartField(self) -> GridGreaterThanZeroDoubleField:
-        return self.__colSpacingStartField
-    
-    def setColSpacingEndField(self, f: GridGreaterThanZeroDoubleField):
-        f.filled.connect(self.colSpacingFieldFilled)
-        self.__colSpacingEndField = f
+    def getColSpacingField(self) -> GridVariableSpacingField:
+        return self.__colSpacingField
 
-    def getColSpacingEndField(self) -> GridGreaterThanZeroDoubleField:
-        return self.__colSpacingEndField
-    
     def colSpacingFieldFilled(self, filled: bool):
         b = self.getToolButtonAddCols()
-        if not filled:
-            b.setEnabled(False)
-        else:
-            b.setEnabled(self.colSpacingFieldIsFilled())
-    
-    def colSpacingFieldIsFilled(self) -> bool:
-        fields = [self.getColSpacingStartField(),
-                  self.getColSpacingEndField()]
+        b.setEnabled(filled)
 
-        for field in fields:
-            if not field.isFilled():
-                return False
-        return True
-
-    def setRowSpacingStartField(self, f: GridGreaterThanZeroDoubleField):
+    def setRowSpacingField(self, f: GridVariableSpacingField):
         f.filled.connect(self.rowSpacingFieldFilled)
-        self.__rowSpacingStartField = f
+        self.__rowSpacingField = f
 
-    def getRowSpacingStartField(self) -> GridGreaterThanZeroDoubleField:
-        return self.__rowSpacingStartField
-    
-    def setRowSpacingEndField(self, f: GridGreaterThanZeroDoubleField):
-        f.filled.connect(self.rowSpacingFieldFilled)
-        self.__rowSpacingEndField = f
-
-    def getRowSpacingEndField(self) -> GridGreaterThanZeroDoubleField:
-        return self.__rowSpacingEndField
+    def getRowSpacingField(self) -> GridVariableSpacingField:
+        return self.__rowSpacingField
 
     def rowSpacingFieldFilled(self, filled: bool):
         b = self.getToolButtonAddRows()
-        if not filled:
-            b.setEnabled(False)
-        else:
-            b.setEnabled(self.rowSpacingFieldIsFilled())
-    
-    def rowSpacingFieldIsFilled(self) -> bool:
-        fields = [self.getRowSpacingStartField(),
-                  self.getRowSpacingEndField()]
-
-        for field in fields:
-            if not field.isFilled():
-                return False
-        return True
+        b.setEnabled(filled)
 
     def setToolButtonAddCols(self, b: QToolButton):
         icon = QIcon(":images/themes/default/mActionAdd.svg")
@@ -147,13 +113,14 @@ class GridVariableLayoutField(QObject):
         return self.__toolButtonAddCols
 
     def toolButtonAddColsClicked(self):
-        colQuantityField = self.getColQuantityField()
-        colSpacingStartField = self.getColSpacingStartField()
-        colSpacingEndField = self.getColSpacingEndField()
+        quantityField = self.getColQuantityField()
+        spacingField = self.getColSpacingField()
+        spacingStartField = spacingField.getSpacingStartField()
+        spacingEndField = spacingField.getSpacingEndField()
 
-        n = colQuantityField.value()
-        spacingStart = colSpacingStartField.getValue()
-        spacingEnd = colSpacingEndField.getValue()
+        n = quantityField.value()
+        spacingStart = spacingStartField.getValue()
+        spacingEnd = spacingEndField.getValue()
 
         colLayout = GridColLayout(n, spacingStart, spacingEnd)
         self.__itemlayouts.append(colLayout)
@@ -171,13 +138,14 @@ class GridVariableLayoutField(QObject):
         return self.__toolButtonAddRows
 
     def toolButtonAddRowsClicked(self):
-        rowQuantityField = self.getRowQuantityField()
-        rowSpacingStartField = self.getRowSpacingStartField()
-        rowSpacingEndField = self.getRowSpacingEndField()
+        quantityField = self.getRowQuantityField()
+        spacingField = self.getRowSpacingField()
+        spacingStartField = spacingField.getSpacingStartField()
+        spacingEndField = spacingField.getSpacingEndField()
 
-        n = rowQuantityField.value()
-        spacingStart = rowSpacingStartField.getValue()
-        spacingEnd = rowSpacingEndField.getValue()
+        n = quantityField.value()
+        spacingStart = spacingStartField.getValue()
+        spacingEnd = spacingEndField.getValue()
 
         rowLayout = GridRowLayout(n, spacingStart, spacingEnd)
         self.__itemlayouts.append(rowLayout)
@@ -193,13 +161,12 @@ class GridVariableLayoutField(QObject):
 
     def setVisible(self, v: bool):
         items = [self.getTableWidget(),
-                 self.getColSpacingStartField(),
-                 self.getColSpacingEndField(),
-                 self.getRowSpacingStartField(),
-                 self.getRowSpacingEndField(),
+                 self.getColSpacingField(),
+                 self.getRowSpacingField(),
                  self.getToolButtonAddCols(),
                  self.getToolButtonAddRows(),
-                 self.getSpacingLabel()]
+                 self.getSpacingLabel(),
+                 self.getLayoutLabel()]
         
         for item in items:
             item.setVisible(v)

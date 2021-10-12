@@ -38,6 +38,7 @@ from .grid_layout_field import GridLayoutField
 from .grid_layer_name_field import GridLayerNameField
 from .capture_point_tool import CapturePointTool
 from .grid_double_field import GridDoubleField, GridGreaterThanZeroDoubleField
+from .grid_variable_spacing_field import GridVariableSpacingField
 from .grid_origin_field import GridOriginField
 from .grid_regular_layout_field import GridRegularLayoutField
 from .grid_variable_layout_field import GridVariableLayoutField
@@ -253,9 +254,11 @@ class MohidPlugin:
             colSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd)
             rowSpacingStartField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingStart)
             rowSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingEnd)
-            variableLayoutField = GridVariableLayoutField(self.dockwidget.tableWidgetLayout,
+            colVariableSpacingField = GridVariableSpacingField(colSpacingStartField, colSpacingEndField)
+            rowVariableSpacingField = GridVariableSpacingField(rowSpacingStartField, rowSpacingEndField)
+            variableLayoutField = GridVariableLayoutField(self.dockwidget.tableWidgetLayout, self.dockwidget.labelLayout,
                                                           self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity,
-                                                          colSpacingStartField, colSpacingEndField, rowSpacingStartField, rowSpacingEndField,
+                                                          colVariableSpacingField, rowVariableSpacingField,
                                                           self.dockwidget.toolButtonAddColumns, self.dockwidget.toolButtonAddRows,
                                                           self.dockwidget.labelSpacingRange)
             layoutField = GridLayoutField(self.dockwidget.radioButtonRegular, regularLayoutField,
