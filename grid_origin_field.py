@@ -65,3 +65,7 @@ class GridOriginField(QObject):
 
         origin = Point(x, y)
         return origin
+    
+    def close(self):
+        t = self.getCapturePointTool()
+        t.close()

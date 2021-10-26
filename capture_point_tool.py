@@ -58,3 +58,8 @@ class CapturePointTool(QgsMapToolEmitPoint):
         point = coordinateTransform.transform(point_canvas)
         self.canvasClicked.emit(point)
         interface.mapCanvas().unsetMapTool(self)
+    
+    def close(self):
+        b = self.button()
+        if b.isChecked():
+            b.toggle()

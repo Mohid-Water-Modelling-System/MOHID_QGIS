@@ -38,9 +38,11 @@ from .grid_layout_field import GridLayoutField
 from .grid_layer_name_field import GridLayerNameField
 from .capture_point_tool import CapturePointTool
 from .grid_double_field import GridDoubleField, GridGreaterThanZeroDoubleField
+from .grid_layout_table import GridLayoutTable
 from .grid_variable_spacing_field import GridVariableSpacingField
 from .grid_origin_field import GridOriginField
 from .grid_regular_layout_field import GridRegularLayoutField
+from .grid_item_adder import GridColAdder, GridRowAdder
 from .grid_variable_layout_field import GridVariableLayoutField
 
 
@@ -200,8 +202,8 @@ class MohidPlugin:
         # when closing the docked window:
         # self.dockwidget = None
 
-        if self.dockwidget.toolButtonCapturePoint.isChecked():
-            self.dockwidget.toolButtonCapturePoint.toggle()
+        gridTool = self.getGridTool()
+        gridTool.close()
 
         self.pluginIsActive = False
 
@@ -248,21 +250,18 @@ class MohidPlugin:
             angleField = GridDoubleField(self.dockwidget.lineEditAngle)
             colSpacingField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditRegularColumnsSpacing)
             rowSpacingField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditRegularRowsSpacing)
-            regularLayoutField = GridRegularLayoutField(self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity,
-                                                        colSpacingField, rowSpacingField, self.dockwidget.labelRegularSpacing)
+            regularLayoutField = GridRegularLayoutField(self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity, colSpacingField, rowSpacingField, self.dockwidget.labelRegularSpacing)
+            gridLayoutTable = GridLayoutTable(self.dockwidget.labelLayout, self.dockwidget.tableWidgetLayout)
             colSpacingStartField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedColumnsSpacingStart)
             colSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd)
             rowSpacingStartField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingStart)
             rowSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingEnd)
             colVariableSpacingField = GridVariableSpacingField(colSpacingStartField, colSpacingEndField)
             rowVariableSpacingField = GridVariableSpacingField(rowSpacingStartField, rowSpacingEndField)
-            variableLayoutField = GridVariableLayoutField(self.dockwidget.tableWidgetLayout, self.dockwidget.labelLayout,
-                                                          self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity,
-                                                          colVariableSpacingField, rowVariableSpacingField,
-                                                          self.dockwidget.toolButtonAddColumns, self.dockwidget.toolButtonAddRows,
-                                                          self.dockwidget.labelSpacingRange)
-            layoutField = GridLayoutField(self.dockwidget.radioButtonRegular, regularLayoutField,
-                                          self.dockwidget.radioButtonVariableSpaced, variableLayoutField)
+            colAdder = GridColAdder(self.dockwidget.spinBoxColumnsQuantity, colVariableSpacingField, self.dockwidget.toolButtonAddColumns)
+            rowAdder = GridRowAdder(self.dockwidget.spinBoxRowsQuantity, rowVariableSpacingField, self.dockwidget.toolButtonAddRows)
+            variableLayoutField = GridVariableLayoutField(gridLayoutTable, self.dockwidget.labelSpacingRange, colAdder, rowAdder)
+            layoutField = GridLayoutField(self.dockwidget.radioButtonRegular, regularLayoutField, self.dockwidget.radioButtonVariableSpaced, variableLayoutField)
             layerNameField = GridLayerNameField(self.dockwidget.lineEditLayerName, self.dockwidget.toolButtonLayerName)
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
             gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave)

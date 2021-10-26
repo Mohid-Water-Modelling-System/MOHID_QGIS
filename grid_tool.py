@@ -80,3 +80,7 @@ class GridTool:
     def saveBtnClicked(self):
         QgsMessageLog.logMessage("GridTool: saveBtn clicked", 'MOHID plugin', level=Qgis.Info)
         pass
+
+    def close(self):
+        f = self.getForm()
+        f.close()

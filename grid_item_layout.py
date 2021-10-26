@@ -1,4 +1,7 @@
+from qgis.PyQt.QtWidgets import QTableWidgetItem
+
 class GridItemLayout:
+    type = ""
     def __init__(self, n: int, spacingStart: float, spacingEnd: float):
         self.setN(n)
         self.setSpacingStart(spacingStart)
@@ -27,9 +30,21 @@ class GridItemLayout:
     
     def getSpacingEnd(self) -> float:
         return self.__spacingEnd
+    
+    def getTableWidgetItems(self) -> list[QTableWidgetItem]:
+        n = self.getN()
+        type = self.type
+        spacingStart = self.getSpacingStart()
+        spacingEnd = self.getSpacingEnd()
+        spacing = str(spacingStart) + " to " + str(spacingEnd)
+
+        items = [QTableWidgetItem(str(n)), QTableWidgetItem(type), QTableWidgetItem(spacing)]
+        return items
 
 class GridColLayout(GridItemLayout):
+    type = "Column"
     pass
 
 class GridRowLayout(GridItemLayout):
+    type = "Row"
     pass

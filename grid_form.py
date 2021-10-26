@@ -91,3 +91,7 @@ class GridForm(QObject):
 
         grid = Grid(crs, origin, angle, layout)
         return grid
+
+    def close(self):
+        f = self.getOriginField()
+        f.close()
