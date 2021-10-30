@@ -65,3 +65,8 @@ class Grid:
                 features += [feature]
         provider.addFeatures(features)
         layer.updateExtents()
+    
+    def __str__(self):
+        origin = self.getOrigin()
+        return "ORIGIN_X               :" + str(origin.x()) + '\n' \
+        "ORIGIN_Y               :" + str(origin.x())
