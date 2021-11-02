@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import QLabel
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from .grid_variable_layout import GridVariableLayout
+from .grid_layout import GridVariableLayout
 from .grid_item_layout import GridColLayout, GridRowLayout
 from .grid_item_adder import GridColAdder, GridRowAdder
 from .grid_layout_table import GridLayoutTable

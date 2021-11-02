@@ -30,6 +30,7 @@ from .resources import *
 # Import the code for the DockWidget
 from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
+import json
 
 from qgis.core import QgsProject
 from .grid_tool import GridTool
@@ -44,6 +45,7 @@ from .grid_origin_field import GridOriginField
 from .grid_regular_layout_field import GridRegularLayoutField
 from .grid_item_adder import GridColAdder, GridRowAdder
 from .grid_variable_layout_field import GridVariableLayoutField
+from .crs import CRS
 
 
 class MohidPlugin:
@@ -240,7 +242,10 @@ class MohidPlugin:
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
-            crs = QgsProject.instance().crs()
+            pluginDir = self.getPluginDir()
+            f = open(pluginDir + '/config.json')
+            self.loadConfig(f)
+            crs = CRS(QgsProject.instance().crs())
             crsField = self.dockwidget.mQgsProjectionSelectionWidget
             crsField.setCrs(crs)
             latitudeField = GridDoubleField(self.dockwidget.lineEditOriginLatitude)
@@ -264,7 +269,8 @@ class MohidPlugin:
             layoutField = GridLayoutField(self.dockwidget.radioButtonRegular, regularLayoutField, self.dockwidget.radioButtonVariableSpaced, variableLayoutField)
             layerNameField = GridLayerNameField(self.dockwidget.lineEditLayerName, self.dockwidget.toolButtonLayerName)
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
-            gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave)
+            config = self.getConfig()
+            gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
             self.setGridTool(gridTool)
 
             # show the dockwidget
@@ -277,3 +283,16 @@ class MohidPlugin:
     
     def getGridTool(self) -> GridTool:
         return self.__gridTool
+    
+    def getPluginDir(self) -> str:
+        return self.plugin_dir
+    
+    def setConfig(self, c: dict):
+        self.__config = c
+    
+    def getConfig(self) -> dict:
+        return self.__config
+
+    def loadConfig(self, f):
+        c = json.load(f)
+        self.setConfig(c)

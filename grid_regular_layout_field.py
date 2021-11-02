@@ -1,5 +1,5 @@
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from .grid_regular_layout import GridRegularLayout
+from .grid_layout import GridRegularLayout
 from .grid_double_field import GridGreaterThanZeroDoubleField
 from qgis.PyQt.QtWidgets import QLabel, QSpinBox
 

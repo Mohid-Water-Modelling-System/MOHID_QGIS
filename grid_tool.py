@@ -2,13 +2,15 @@ from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
 from .grid_form import GridForm
 from qgis.core import QgsProject
 from .grid import Grid
+import os.path
 
 class GridTool:
-    def __init__(self, f: GridForm, previewBtn: QPushButton, loadBtn: QPushButton, saveBtn: QPushButton):
+    def __init__(self, f: GridForm, previewBtn: QPushButton, loadBtn: QPushButton, saveBtn: QPushButton, config: dict):
         self.setForm(f)
         self.setPreviewBtn(previewBtn)
         self.setLoadBtn(loadBtn)
         self.setSaveBtn(saveBtn)
+        self.setConfig(config)
 
     def setForm(self, f: GridForm):
         f.filled.connect(self.formFilled)
@@ -37,6 +39,12 @@ class GridTool:
     
     def getSaveBtn(self) -> QPushButton:
         return self.__saveBtn
+    
+    def setConfig(self, c: dict):
+        self.__config = c
+    
+    def getConfig(self) -> dict:
+        return self.__config
 
     def formFilled(self, filled: bool):
         previewBtn = self.getPreviewBtn()
@@ -67,13 +75,19 @@ class GridTool:
 
     def saveBtnClicked(self):
         form = self.getForm()
+        config = self.getConfig()
         grid = form.toGrid()
         nameField = form.getLayerNameField()
         name = nameField.getText()
         fileName = QFileDialog.getSaveFileName(None, 'Save grid', name +'.dat', '*.dat')[0]
+
+        fmt = config["fmt"]
+        key = config["keys"]["fileName"]
+        output = fmt.format(key, os.path.splitext(fileName)[0] + ".grd") + grid.toString(config)
+
         if fileName:
             f = open(fileName, "w")
-            f.write(str(grid))
+            f.write(output)
             f.close()
         
 

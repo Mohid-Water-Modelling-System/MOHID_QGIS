@@ -35,3 +35,5 @@ Once activated, a new plugin button should appear in the Toolbar.
 - [ ] Read grid from .grd file
 - [ ] Write grid to .grd file
 - [x] Optimize definition of points and polygons
+- [ ] Configure MOHID coordinate types in config.json
+- [ ] Remove variable layout items from layout table

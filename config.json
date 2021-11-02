@@ -1,0 +1,21 @@
+{
+    "fmt": "{:<23}: {}\n",
+    "keys": {
+        "fileName": "OUTPUT_FILE",
+        "Origin": {
+            "x": "ORIGIN_X",
+            "y": "ORIGIN_Y"
+        },
+        "Angle": "GRID_ANGLE",
+        "CRS": "COORD_TIP"
+    },
+    "CRSTypes" : {
+        "EPSG:4327": 1,
+        "EPSG:32629": 2,
+        "EPSG:20790": 3,
+        "EPSG:1234": 4,
+        "EPSG:5678": 5,
+        "EPSG:9123": 6,
+        "EPSG:5709": 7
+    }
+}

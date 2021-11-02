@@ -3,13 +3,14 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QCursor, QIcon
 from qgis.PyQt.QtWidgets import QToolButton
 from qgis.gui import QgsMapToolEmitPoint, QgsMapMouseEvent, QgisInterface
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.core import QgsCoordinateTransform, QgsProject
+from .crs import CRS
 
 
 class CapturePointTool(QgsMapToolEmitPoint):
     canvasClicked = pyqtSignal('QgsPointXY')
 
-    def __init__(self, interface: QgisInterface, crs: QgsCoordinateReferenceSystem, btn: QToolButton):
+    def __init__(self, interface: QgisInterface, crs: CRS, btn: QToolButton):
         canvas = interface.mapCanvas()
         super().__init__(canvas)
         self.setCrs(crs)
@@ -21,10 +22,10 @@ class CapturePointTool(QgsMapToolEmitPoint):
         cursor = QCursor(pixmap)
         self.setCursor(cursor)
 
-    def setCrs(self, crs: QgsCoordinateReferenceSystem):
+    def setCrs(self, crs: CRS):
         self.__crs = crs
 
-    def getCrs(self) -> QgsCoordinateReferenceSystem:
+    def getCrs(self) -> CRS:
         return self.__crs
 
     def setInterface(self, i: QgisInterface):

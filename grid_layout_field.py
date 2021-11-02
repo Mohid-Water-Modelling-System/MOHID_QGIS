@@ -1,8 +1,8 @@
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QRadioButton
+from .grid_layout import GridLayout
 from .grid_regular_layout_field import GridRegularLayoutField
 from .grid_variable_layout_field import GridVariableLayoutField
-from .grid_layout import GridLayout
 
 
 class GridLayoutField(QObject):

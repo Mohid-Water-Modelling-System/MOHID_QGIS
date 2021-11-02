@@ -5,6 +5,8 @@ from .grid_double_field import GridDoubleField
 from .grid_layout_field import GridLayoutField
 from .grid_layer_name_field import GridLayerNameField
 from .grid import Grid
+from .crs import CRS
+from .angle import Angle
 
 class GridForm(QObject):
     filled = pyqtSignal(bool)
@@ -27,7 +29,7 @@ class GridForm(QObject):
     
     def crsFieldChanged(self):
         crsField = self.getCrsField()
-        crs = crsField.crs()
+        crs = CRS(crsField.crs())
 
         originField = self.getOriginField()
         capturePointTool = originField.getCapturePointTool()
@@ -84,9 +86,9 @@ class GridForm(QObject):
         angleField = self.getAngleField()
         layoutField = self.getLayoutField()
 
-        crs = crsField.crs()
+        crs = CRS(crsField.crs())
         origin = originField.getOrigin()
-        angle = angleField.getValue()
+        angle = Angle(angleField.getValue())
         layout = layoutField.getLayout()
 
         grid = Grid(crs, origin, angle, layout)

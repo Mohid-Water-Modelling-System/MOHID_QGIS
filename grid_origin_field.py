@@ -2,7 +2,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import QgsPointXY
 from .grid_double_field import GridDoubleField
 from .capture_point_tool import CapturePointTool
-from .point import Point
+from .point import Origin
 
 class GridOriginField(QObject):
     filled = pyqtSignal(bool)
@@ -56,14 +56,14 @@ class GridOriginField(QObject):
             
         return True
     
-    def getOrigin(self) -> Point:
+    def getOrigin(self) -> Origin:
         latitudeField = self.getLatitudeField()
         longitudeField = self.getLongitudeField()
 
         x = latitudeField.getValue()
         y = longitudeField.getValue()
 
-        origin = Point(x, y)
+        origin = Origin(x, y)
         return origin
     
     def close(self):
