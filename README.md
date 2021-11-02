@@ -30,10 +30,9 @@ Once activated, a new plugin button should appear in the Toolbar.
 - [x] Variable spaced grid creator
 - [x] Set coordinates with mouse capture
 - [x] Dock widget
-- [ ] Read grid from .grd file
-- [ ] Write grit to .grd file
-- [ ] Read grid from .grd file
+- [ ] Write grid to .dat file
 - [ ] Write grid to .grd file
+- [ ] Read grid from .grd file
 - [x] Optimize definition of points and polygons
 - [ ] Configure MOHID coordinate types in config.json
 - [ ] Remove variable layout items from layout table
