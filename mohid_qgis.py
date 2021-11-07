@@ -48,6 +48,12 @@ from .grid_variable_layout_field import GridVariableLayoutField
 from .crs import CRS
 
 
+"""
+The MohidPlugin is the main class of the plugin.
+It was generated with the PBT tool and the only functions that matter to the programmer are:
+    - run
+    - onClosePlugin
+"""
 class MohidPlugin:
     """QGIS Plugin Implementation."""
 
