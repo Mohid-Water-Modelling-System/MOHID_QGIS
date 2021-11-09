@@ -51,8 +51,10 @@ from .crs import CRS
 """
 The MohidPlugin is the main class of the plugin.
 It was generated with the PBT tool and the only functions that matter to the programmer are:
-    - run
-    - onClosePlugin
+    - run: function that runs when the user opens the plugin. This function composes the Grid Tool,
+    with objects that handle the fields of the Grid Tool interface.
+    - onClosePlugin: function that is called when the user closes the plugin. This function is
+    useful to deactivate the CapturePointTool if it is active when the user closes the plugin.
 """
 class MohidPlugin:
     """QGIS Plugin Implementation."""

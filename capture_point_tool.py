@@ -51,7 +51,6 @@ class CapturePointTool(QgsMapToolEmitPoint):
     to the buttonToggled function.
     When the button is toggled, the buttonToggled function is called.
     """
-
     def setButton(self, b: QToolButton):
         icon = QIcon(":images/themes/default/cursors/mCapturePoint.svg")
         b.setIcon(icon)

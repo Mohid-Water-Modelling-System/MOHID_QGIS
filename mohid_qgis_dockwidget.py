@@ -30,7 +30,10 @@ from qgis.PyQt.QtCore import pyqtSignal
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'mohid_qgis_dockwidget_base.ui'))
 
-
+"""
+This class and this entire file was automatically generated with the PBT tool.
+There should be no need to touch it or understand it.
+"""
 class MohidPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
