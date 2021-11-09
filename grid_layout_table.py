@@ -3,9 +3,27 @@ from qgis.PyQt.QtWidgets import QTableWidget, QTableWidgetItem, QToolButton, QLa
 from qgis.PyQt.QtGui import QIcon
 from .grid_item_layout import GridItemLayout, GridColLayout, GridRowLayout
 
+"""
+The GridLayoutTable stores the gridItemLayouts that the user adds in the GridVariableLayoutField
+and lists them in a table in the plugin interface.
+This class is a child of QObject to be able to have a pyqtSignal attribute.
+"""
 class GridLayoutTable(QObject):
+    """
+    The filled attribute is a signal that emits a boolean value when the layout built from the
+    added items becomes acceptable or not.
+    If the layout is acceptable (has both columns and rows), true is emitted.
+    If the layout is not acceptable, false is emitted.
+    """
     filled = pyqtSignal(bool)
 
+    """
+    The constructor of the GridLayoutTable class receives:
+        - a label saying "Layout", that is displayed next to the tablewidget
+        - a tableWidget that lists the GridLayoutItems added by the user
+    The constructor will initialize two empty lists, one for storing GridColLayouts and another for
+    GridRowLayouts. When both lists have elements the layout is acceptable.
+    """
     def __init__(self, layoutLabel: QLabel, tableWidget: QTableWidget):
         super().__init__()
 
