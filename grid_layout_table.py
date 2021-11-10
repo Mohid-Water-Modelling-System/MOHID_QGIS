@@ -38,6 +38,10 @@ class GridLayoutTable(QObject):
     def getLayoutLabel(self) -> QLabel:
         return self.__layoutLabel
 
+    """
+    The tableWidget setter a QTableWidget object,
+    creates 4 columns on the QTableWidget and sets "Quantity", "Type" and "Spacing" as header labels of the first 3 columns.
+    """
     def setTableWidget(self, t: QTableWidget):
         labels = ["Quantity", "Type", "Spacing", ""]
         columnCount = len(labels)
@@ -60,6 +64,11 @@ class GridLayoutTable(QObject):
     def getRowLayouts(self) ->list[GridRowLayout]:
         return self.__rowLayouts
 
+    """
+    The addColLayout function receives the layout of a set of columns and adds it to the list of column layouts and to the tableWidget (1 row).
+    It also checks if the layout is correctly defined (has both rows and columns) and emits the signal "filled" which has a boolean
+    that is true when the layout is correctly defined and false when the layout is not correctly defined yet.
+    """
     def addColLayout(self, l: GridColLayout):
         colLayouts = self.getColLayouts()
         colLayouts.append(l)
@@ -67,6 +76,11 @@ class GridLayoutTable(QObject):
 
         self.filled.emit(self.isFilled())
     
+    """
+    The addRowLayout function receives the layout of a set of rows and adds it to the list of row layouts and to the tableWidget (1 row).
+    It also checks if the layout is correctly defined (has both rows and columns) and emits the signal "filled" which has a boolean
+    that is true when the layout is correctly defined and false when the layout is not correctly defined yet.
+    """
     def addRowLayout(self, l: GridRowLayout):
         rowLayouts = self.getRowLayouts()
         rowLayouts.append(l)
@@ -74,6 +88,10 @@ class GridLayoutTable(QObject):
 
         self.filled.emit(self.isFilled())
 
+
+    """
+    The addItemLayout function is used by the addColLayout and addRowLayout functions to display a item layout in a row of the tableWidget.
+    """
     def addItemLayout(self, l: GridItemLayout):
         t = self.getTableWidget()
         rowCount = t.rowCount()
@@ -90,12 +108,21 @@ class GridLayoutTable(QObject):
         #t.setCellWidget(rowCount, colCount - 1, b)
         #t.resizeColumnToContents(colCount - 1)
 
+
+    """
+    The isFilled function returns true if the layout is complete (has both rows and columns) and false otherwise.
+    """
     def isFilled(self) -> bool:
         colLayouts = self.getColLayouts()
         rowLayouts = self.getRowLayouts()
         filled = bool(colLayouts) and bool(rowLayouts)
         return filled
     
+    """
+    The setVisible function displays the tableWidget and its label if the "v" argument is true and hides them
+    if the "v" argument is false.
+    This function is used when the user selects which type of layout to set.
+    """
     def setVisible(self, v: bool):
         items = [self.getTableWidget(),
                  self.getLayoutLabel()]
