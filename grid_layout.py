@@ -3,7 +3,14 @@ from .cell import Cell
 from .angle import Angle
 from .grid_item_layout import GridItemLayout
 
-
+"""
+The GridLayout class is used to build the grid.
+It is in the layout that the number of rows and columns of the grid, as well as the spacing of
+each row and column, are specified.
+The GridLayout class is the parent class of 2 classes:
+    - The GridRegularLayout, that defines the layout of a regular grid
+    - The GridVariableLayout, that defines the layout of a variable spaced grid
+"""
 class GridLayout:
     def getNCols(self) -> int:
         pass
@@ -11,9 +18,25 @@ class GridLayout:
     def getNRows(self) -> int:
         pass
 
+    """
+    The toPoints function returns the points that define the corners of the grid cells.
+    To call this function the GridLayout must already have the rows and columns defined
+    (including their spacings) and only the origin point (bottom left point) and the
+    angle of the grid have to be provided for the points of the grid to be calculated.
+    The points are returned in a matrix where each point can be obtained from the row number
+    and column number - points[row][column] .
+    """
     def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
         pass
 
+    """
+    The toCells function returns the cells of the grid.
+    To call this function the GridLayout must already have the rows and columns defined
+    (including their spacings) and only the origin point (bottom left point) and the
+    angle of the grid have to be provided for the cells to be calculated.
+    The cells are returned in a matrix where each cell can be obtained from the row number
+    and column number - cells[row][column] .
+    """
     def toCells(self, origin: Origin, angle: Angle) -> list[list[Cell]]:
         points = self.toPoints(origin, angle)
         nRows = self.getNRows()
@@ -32,11 +55,27 @@ class GridLayout:
             cells.append(row)
         return cells
     
+    """
+    The toString function is used to write the layout of the grid in MOHID format.
+    The string is built according to the first argument of the function, which is
+    the configuration provided in form of a dictionary.
+    This configuration was previously read from the config.json file.
+    """
     def toString(self, config: dict) -> str:
         pass
 
-
+"""
+The GridRegularLayout is used to build a regular grid: All columns have the same spacing
+and all rows have the same spacing.
+"""
 class GridRegularLayout(GridLayout):
+    """
+    The constructor of the GridRegularLayout class receives:
+        - the number of columns of the grid
+        - the number of rows of the grid
+        - the spacing of the columns
+        - the spacing of the rows
+    """
     def __init__(self, nCols: int, nRows: int, colSpacing: float, rowSpacing: float):
         self.setNCols(nCols)
         self.setNRows(nRows)
@@ -75,6 +114,14 @@ class GridRegularLayout(GridLayout):
     def getRowSpacing(self) -> float:
         return self.__rowSpacing
 
+    """
+    The toPoints function returns the points that define the corners of the grid cells.
+    To call this function the GridLayout must already have the rows and columns defined
+    (including their spacings) and only the origin point (bottom left point) and the
+    angle of the grid have to be provided for the points of the grid to be calculated.
+    The points are returned in a matrix where each point can be obtained from the row number
+    and column number - points[row][column] .
+    """
     def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
         nCols = self.getNCols()
         nRows = self.getNRows()
@@ -96,11 +143,26 @@ class GridRegularLayout(GridLayout):
 
         return points
     
+    """
+    The toString function is used to write the layout of the grid in MOHID format.
+    The string is built according to the first argument of the function, which is
+    the configuration provided in form of a dictionary.
+    This configuration was previously read from the config.json file.
+    """
+    #TODO: complete this function
     def toString(self, config: dict) -> str:
         return ""
 
-
+"""
+The GridVariableLayout is used to build a variable spaced grid: The columns may have different
+spacings and the rows may also have different spacings.
+"""
 class GridVariableLayout(GridLayout):
+    """
+    The constructor of the GridVariableLayout receives:
+        - the layouts of the columns
+        - the layouts of the rows
+    """
     def __init__(self, colLayouts: list[GridItemLayout], rowLayouts: list[GridItemLayout]):
         self.setColLayouts(colLayouts)
         self.setRowLayouts(rowLayouts)
@@ -133,6 +195,14 @@ class GridVariableLayout(GridLayout):
         n = sum([i.getN() for i in l])
         return n
 
+    """
+    The toPoints function returns the points that define the corners of the grid cells.
+    To call this function the GridLayout must already have the rows and columns defined
+    (including their spacings) and only the origin point (bottom left point) and the
+    angle of the grid have to be provided for the points of the grid to be calculated.
+    The points are returned in a matrix where each point can be obtained from the row number
+    and column number - points[row][column] .
+    """
     def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
         cls = self.getColLayouts()
         rls = self.getRowLayouts()
@@ -160,5 +230,12 @@ class GridVariableLayout(GridLayout):
 
         return points
 
+    """
+    The toString function is used to write the layout of the grid in MOHID format.
+    The string is built according to the first argument of the function, which is
+    the configuration provided in form of a dictionary.
+    This configuration was previously read from the config.json file.
+    """
+    #TODO: complete this function
     def toString(self, config: dict) -> str:
         return ""
