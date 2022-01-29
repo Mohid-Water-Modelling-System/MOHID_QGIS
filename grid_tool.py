@@ -144,6 +144,7 @@ class GridTool:
         key = config["keys"]["fileName"]
         output = fmt.format(key, os.path.splitext(fileName)[0] + ".grd") + grid.toString(config)
 
+        #TODO: change to with context
         if fileName:
             f = open(fileName, "w")
             f.write(output)

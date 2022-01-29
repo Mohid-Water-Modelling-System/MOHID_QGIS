@@ -1,3 +1,4 @@
+from os import replace
 from qgis.PyQt.QtWidgets import QLineEdit
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtCore import QObject, pyqtSignal
@@ -69,7 +70,7 @@ class GridDoubleField(QObject):
     """
     def getValue(self) -> float:
         l = self.getLineEdit()
-        text = l.text()
+        text = l.text().replace(",", ".")
         value = float(text)
         return value
     

@@ -1,5 +1,6 @@
-from qgis.core import QgsPolygon, QgsLineString
+from qgis.core import QgsPolygon, QgsLineString, QgsPoint
 from .point import Point
+from typing import List
 
 """
 The Cell class implements a cell of the grid.
@@ -13,10 +14,10 @@ class Cell:
     def __init__(self, a: Point, b: Point, c: Point, d: Point):
         self.setPoints([a, b, c, d])
 
-    def getPoints(self) -> list[Point]:
+    def getPoints(self) -> List[Point]:
         return self.__points
 
-    def setPoints(self, points: list[Point]):
+    def setPoints(self, points: List[Point]):
         self.__points = points
 
     """
@@ -25,6 +26,16 @@ class Cell:
     """
     def toQgsPolygon(self) -> QgsPolygon:
         points = self.getPoints()
-        line = QgsLineString(points)
-        polygon = QgsPolygon(line)
+        
+        newPoints = []
+        for point in points:
+            newPoints.append(QgsPoint(point))
+        
+        # Polygon needs to be closed, add last point equal to the first to close the ring
+        newPoints.append(newPoints[0])
+        line = QgsLineString(newPoints)
+        try:
+            polygon = QgsPolygon(line, rings=[])
+        except Exception as e:
+            pass
         return polygon

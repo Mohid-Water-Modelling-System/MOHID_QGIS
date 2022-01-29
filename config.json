@@ -10,7 +10,7 @@
         "CRS": "COORD_TIP"
     },
     "CRSTypes" : {
-        "EPSG:4327": 1,
+        "EPSG:4326": 1,
         "EPSG:32629": 2,
         "EPSG:20790": 3,
         "EPSG:1234": 4,

@@ -27,6 +27,6 @@ class GreaterThanZeroDoubleValidator(QDoubleValidator):
     def validate(self, text, pos):
         state, text, pos = super().validate(text, pos)
         if state == QValidator.Acceptable:
-            if float(text) == 0:
+            if float(text.replace(",",".")) == 0:
                 state = QValidator.Intermediate
         return state, text, pos

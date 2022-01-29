@@ -2,7 +2,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtWidgets import QTableWidget, QTableWidgetItem, QToolButton, QLabel
 from qgis.PyQt.QtGui import QIcon
 from .grid_item_layout import GridItemLayout, GridColLayout, GridRowLayout
-
+from typing import List
 """
 The GridLayoutTable stores the gridItemLayouts that the user adds in the GridVariableLayoutField
 and lists them in a table in the plugin interface.
@@ -52,16 +52,16 @@ class GridLayoutTable(QObject):
     def getTableWidget(self) -> QTableWidget:
         return self.__tableWidget
 
-    def setColLayouts(self, l: list[GridColLayout]):
+    def setColLayouts(self, l: List[GridColLayout]):
         self.__colLayouts = l
     
-    def getColLayouts(self) ->list[GridColLayout]:
+    def getColLayouts(self) ->List[GridColLayout]:
         return self.__colLayouts
     
-    def setRowLayouts(self, l: list[GridRowLayout]):
+    def setRowLayouts(self, l: List[GridRowLayout]):
         self.__rowLayouts = l
     
-    def getRowLayouts(self) ->list[GridRowLayout]:
+    def getRowLayouts(self) ->List[GridRowLayout]:
         return self.__rowLayouts
 
     """

@@ -1,5 +1,5 @@
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-
+from typing import List
 """
 The GridItemLayout class stores the layout of a set of rows or columns.
 This class is used for the variable layouts.
@@ -52,7 +52,7 @@ class GridItemLayout:
     The getTableWidgetItems returns a row for listing the layout of the items in the Layout table
     of the Grid Tool interface for variable spaced grids.
     """
-    def getTableWidgetItems(self) -> list[QTableWidgetItem]:
+    def getTableWidgetItems(self) -> List[QTableWidgetItem]:
         n = self.getN()
         type = self.type
         spacingStart = self.getSpacingStart()

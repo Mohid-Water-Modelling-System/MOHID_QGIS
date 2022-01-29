@@ -2,7 +2,7 @@ from .point import Point, Origin
 from .cell import Cell
 from .angle import Angle
 from .grid_item_layout import GridItemLayout
-
+from typing import List
 """
 The GridLayout class is used to build the grid.
 It is in the layout that the number of rows and columns of the grid, as well as the spacing of
@@ -26,7 +26,7 @@ class GridLayout:
     The points are returned in a matrix where each point can be obtained from the row number
     and column number - points[row][column] .
     """
-    def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
+    def toPoints(self, origin: Origin, angle: Angle) -> List[List[Point]]:
         pass
 
     """
@@ -37,7 +37,7 @@ class GridLayout:
     The cells are returned in a matrix where each cell can be obtained from the row number
     and column number - cells[row][column] .
     """
-    def toCells(self, origin: Origin, angle: Angle) -> list[list[Cell]]:
+    def toCells(self, origin: Origin, angle: Angle) -> List[List[Cell]]:
         points = self.toPoints(origin, angle)
         nRows = self.getNRows()
         nCols = self.getNCols()
@@ -122,7 +122,7 @@ class GridRegularLayout(GridLayout):
     The points are returned in a matrix where each point can be obtained from the row number
     and column number - points[row][column] .
     """
-    def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
+    def toPoints(self, origin: Origin, angle: Angle) -> List[List[Point]]:
         nCols = self.getNCols()
         nRows = self.getNRows()
         colSpacing = self.getColSpacing()
@@ -163,26 +163,26 @@ class GridVariableLayout(GridLayout):
         - the layouts of the columns
         - the layouts of the rows
     """
-    def __init__(self, colLayouts: list[GridItemLayout], rowLayouts: list[GridItemLayout]):
+    def __init__(self, colLayouts: List[GridItemLayout], rowLayouts: List[GridItemLayout]):
         self.setColLayouts(colLayouts)
         self.setRowLayouts(rowLayouts)
 
-    def setColLayouts(self, l: list[GridItemLayout]):
+    def setColLayouts(self, l: List[GridItemLayout]):
         if l:
             self.__colLayouts = l
         else:
             raise Exception("Column layout list is empty")
 
-    def getColLayouts(self) -> list[GridItemLayout]:
+    def getColLayouts(self) -> List[GridItemLayout]:
         return self.__colLayouts
 
-    def setRowLayouts(self, l: list[GridItemLayout]):
+    def setRowLayouts(self, l: List[GridItemLayout]):
         if l:
             self.__rowLayouts = l
         else:
             raise Exception("Row layout list is empty")
 
-    def getRowLayouts(self) -> list[GridItemLayout]:
+    def getRowLayouts(self) -> List[GridItemLayout]:
         return self.__rowLayouts
 
     def getNCols(self) -> int:
@@ -203,7 +203,7 @@ class GridVariableLayout(GridLayout):
     The points are returned in a matrix where each point can be obtained from the row number
     and column number - points[row][column] .
     """
-    def toPoints(self, origin: Origin, angle: Angle) -> list[list[Point]]:
+    def toPoints(self, origin: Origin, angle: Angle) -> List[List[Point]]:
         cls = self.getColLayouts()
         rls = self.getRowLayouts()
         x = origin.x()
