@@ -32,7 +32,6 @@ from .mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 import json
 
-import debugpy
 from qgis.core import QgsProject
 from .grid_tool import GridTool
 from .grid_form import GridForm
@@ -68,17 +67,6 @@ class MohidPlugin:
             application at run time.
         :type iface: QgsInterface
         """
-
-        # debug
-
-        debug = False
-        waitForAttach = True
-
-        if debug:
-            debugpy.listen(address=("localhost", 8765))
-            if waitForAttach:
-                debugpy.wait_for_client()
-                debugpy.breakpoint()
 
         # Save reference to the QGIS interface
         self.iface = iface
