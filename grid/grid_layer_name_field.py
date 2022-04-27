@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import QLineEdit, QToolButton
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from .not_empty_validator import NotEmptyValidator
+from ..validators.not_empty_validator import NotEmptyValidator
 
 """
 The GridLayerNameField controls a QLineEdit of the GridTool that receives a string as input.

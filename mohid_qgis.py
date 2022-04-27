@@ -33,19 +33,19 @@ import os.path
 import json
 
 from qgis.core import QgsProject
-from .grid_tool import GridTool
-from .grid_form import GridForm
-from .grid_layout_field import GridLayoutField
-from .grid_layer_name_field import GridLayerNameField
-from .capture_point_tool import CapturePointTool
-from .grid_double_field import GridDoubleField, GridGreaterThanZeroDoubleField
-from .grid_layout_table import GridLayoutTable
-from .grid_variable_spacing_field import GridVariableSpacingField
-from .grid_origin_field import GridOriginField
-from .grid_regular_layout_field import GridRegularLayoutField
-from .grid_item_adder import GridColAdder, GridRowAdder
-from .grid_variable_layout_field import GridVariableLayoutField
-from .crs import CRS
+from .grid.grid_tool import GridTool
+from .grid.grid_form import GridForm
+from .grid.grid_layout_field import GridLayoutField
+from .grid.grid_layer_name_field import GridLayerNameField
+from .grid.capture_point_tool import CapturePointTool
+from .grid.grid_double_field import GridDoubleField, GridGreaterThanZeroDoubleField
+from .grid.grid_layout_table import GridLayoutTable
+from .grid.grid_variable_spacing_field import GridVariableSpacingField
+from .grid.grid_origin_field import GridOriginField
+from .grid.grid_regular_layout_field import GridRegularLayoutField
+from .grid.grid_item_adder import GridColAdder, GridRowAdder
+from .grid.grid_variable_layout_field import GridVariableLayoutField
+from .grid.crs import CRS
 
 
 """

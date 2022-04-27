@@ -2,7 +2,7 @@ from os import replace
 from qgis.PyQt.QtWidgets import QLineEdit
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from .greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
+from ..validators.greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
 
 
 """

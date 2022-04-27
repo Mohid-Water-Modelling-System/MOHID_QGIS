@@ -1,0 +1,292 @@
+import shapefile
+import os
+import sys
+import getopt
+import netCDF4
+import math
+import numpy as np
+"""
+LB_IUB - Two integer numbers defining the minimum and maximum I values along the Y-axis of the grid.
+JLB_JUB - Two integer numbers defining the minimum and maximum J values along the X-axis of the grid.
+COORD_TIP - A flag which indicates the used coordinates type.
+ORIGIN - Two real values, which indicate the origin of the lower left corner of the grid (X Y).
+ZONE - Integer values defining the UTM Zone where the bathymetry is located.
+GRID_ANGLE - Counter-clock mesh rotation relative to the north. The base point is the origin of the grid.
+LATITUDE - Average latitude value used to compute Coriolis frequency and solar radiation when metric coordinates cannot be converted to WGS84 geographic coordinates.
+LONGITUDE - Average longitude value used to compute Coriolis frequency and solar radiation when metric coordinates cannot be converted to WGS84 geographic coordinates.
+CONSTANT_SPACING_X - Boolean defining if the spacing in the X axis is constant
+CONSTANT_SPACING_Y - Boolean defining if the spacing in the Y axis is constant
+DX - Constant spacing distance in XX axis
+DY - Constant spacing distance in YY axis
+"""
+#TESTAR AS DIFERENÇAS ENTRE O NETCDF QUE FUNCIONA E O GERADO
+
+#rootgrp1 = netCDF4.Dataset("../Projects/TagusBathymetry.nc", "r", format="NETCDF4")
+#rootgrp2 = netCDF4.Dataset("../Projects/2021051400.nc", "r", format="NETCDF4")
+###print(rootgrp.dimensions)
+#print(rootgrp1.variables["lat"][:])
+#print(rootgrp2.variables["lat"][:])
+#print(rootgrp1.dimensions)
+#print(rootgrp2.dimensions)
+
+
+def grid2netCDF(input_path):
+    input_f = open(input_path, "r")
+    rootgrp = netCDF4.Dataset(os.path.splitext(input_path)[0] + ".nc", "w", format="NETCDF4")
+
+    is_reading = "info"
+    info = []
+    x_values = []
+    y_values = []
+    data_values = []
+
+    l = input_f.readline()
+    while (l != ""):
+        l = l.rstrip()
+        l = l.split(" ")
+        l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+        if ("<BeginXX>" in l):
+            is_reading = "x"
+        elif ("<BeginYY>" in l):
+            is_reading = "y"
+        elif ("<BeginGridData2D>" in l):
+            is_reading = "data"
+        elif (is_reading == "info"):
+            info += [l]
+        elif (is_reading == "x"):
+            x_values += l
+        elif (is_reading == "y"):
+            y_values += l
+        elif (is_reading == "data"):
+            data_values += l
+        l = input_f.readline()
+    
+    info = [x for x in info if x != []]
+
+    for i in info:
+        if 'COMENT' in i[0]:
+            continue
+        elif i[0] == 'LATITUDE':
+            latitude = float(i[1])
+            print("LATITUDE ", latitude)
+        elif i[0] == 'LONGITUDE':
+            longitude = float(i[1])
+            print("LONGITUDE ", longitude)
+        elif i[0] == 'ORIGIN':
+            origin_x = float(i[1])
+            origin_y = float(i[2])
+            print(origin_x, origin_y)
+        elif i[0] == 'DX':
+            dx = float(i[1])
+            print("DX ",dx)
+        elif i[0] == 'DY':
+            dy = float(i[1])
+            print("DY ",dy)
+        elif i[0] == 'GRID_ANGLE':
+            angle = float(i[1])
+            print(angle)
+        elif i[0] == 'ILB_IUB':
+            i_min = int(i[1])
+            i_max = int(i[2])
+            print("ILB_IUB ", i_min, i_max)
+        elif i[0] == 'JLB_JUB':
+            j_min = int(i[1])
+            j_max = int(i[2])
+            print("JLB_JUB ", j_min, j_max)
+        elif i[0] == 'CONSTANT_SPACING_X':
+            if int(i[1]) == 1:
+                constant_x = True
+            else:
+                constant_x = False
+        elif i[0] == 'CONSTANT_SPACING_Y':
+            if int(i[1]) == 1:
+                constant_y = True
+            else:
+                constant_y = False
+
+    x_values = [(float(x) + origin_x) for x in x_values[:-1]]
+    y_values = [(float(y) + origin_y)for y in y_values[:-1]]
+    data_values = [float(d) for d in data_values[:-1]]
+
+
+    lon = rootgrp.createDimension("lon", j_max)
+    lat = rootgrp.createDimension("lat", i_max)
+    level = rootgrp.createDimension("level", None)
+    time = rootgrp.createDimension("time", None)
+
+    times = rootgrp.createVariable("time","f8",("time",))
+    levels = rootgrp.createVariable("level","i4",("level",))
+    latitudes = rootgrp.createVariable("lat", "f4", ("lat",))
+    longitudes = rootgrp.createVariable("lon", "f4", ("lon",))
+    bathymetry = rootgrp.createVariable("bathymetry", "f4", ("lat", "lon"))
+    
+    latitudes.longname = "latitude"
+    latitudes.standard_name = "latitude"
+    latitudes.units = "degrees_north"
+    latitudes.valid_min = -90.0
+    latitudes.valid_max = 90.0
+    latitudes.axis = "Y"
+    latitudes.reference = "geographical coordinates, WGS84 projection"
+
+    longitudes.longname = "longitude"
+    longitudes.standard_name = "longitude"
+    longitudes.units = "degrees_east"
+    longitudes.valid_min = -180.0
+    longitudes.valid_max = 180.0
+    longitudes.axis = "X"
+    longitudes.reference = "geographical coordinates, WGS84 projection"
+
+    latitudes[:] = np.array(y_values[1:])
+    longitudes[:] = np.array(x_values[1:])
+    bathymetry[:] = np.array(data_values).reshape(i_max, j_max)
+    rootgrp.close()
+    return
+
+
+def gridtest():
+    minx,maxx,miny,maxy = 38.4386, 48.75, -9.8435, 10.1
+    dx = 1
+    dy = 1
+
+    nx = int(math.ceil(abs(maxx - minx)/dx))
+    ny = int(math.ceil(abs(maxy - miny)/dy))
+
+    w = shapefile.Writer("..\Projects\TestGrid")
+    w.autoBalance = 1
+    w.field("ID")
+    id=0
+
+    for i in range(ny):
+        for j in range(nx):
+            id+=1
+            vertices = []
+            parts = []
+            vertices.append([min(minx+dx*j,maxx),max(maxy-dy*i,miny)])
+            vertices.append([min(minx+dx*(j+1),maxx),max(maxy-dy*i,miny)])
+            vertices.append([min(minx+dx*(j+1),maxx),max(maxy-dy*(i+1),miny)])
+            vertices.append([min(minx+dx*j,maxx),max(maxy-dy*(i+1),miny)])
+            parts.append(vertices)
+            w.poly(parts)
+            w.record(id)
+    w.close()
+    return
+
+def grid2shp(input_path):
+    input_f = open(input_path, "r")
+    writer = shapefile.Writer(os.path.splitext(input_path)[0])
+    writer.field("ID", "N")
+    info = []
+
+
+    origin_x = 0.0
+    origin_y = 0.0
+    latitude = 0.0
+    longitude = 0.0
+    constant_x = True
+    constant_y = True
+    dx = 0.0
+    dy = 0.0
+    i_min = 0
+    i_max = 0
+    j_min = 0
+    j_max = 0
+    angle = 0.0
+
+    l = input_f.readline()
+
+    while (l != ""):
+        l = l.rstrip()
+        l = l.split(" ")
+        l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+        info += [l]
+        l = input_f.readline()
+    print(info)
+    
+    info = [x for x in info if x != []]
+    for i in info:
+        if 'COMENT' in i[0]:
+            continue
+        elif i[0] == 'LATITUDE':
+            latitude = float(i[1])
+            print("LATITUDE ", latitude)
+        elif i[0] == 'LONGITUDE':
+            longitude = float(i[1])
+            print("LONGITUDE ", longitude)
+        elif i[0] == 'ORIGIN':
+            origin_x = float(i[1])
+            origin_y = float(i[2])
+            print(origin_x, origin_y)
+        elif i[0] == 'DX':
+            dx = float(i[1])
+            print("DX ",dx)
+        elif i[0] == 'DY':
+            dy = float(i[1])
+            print("DY ",dy)
+        elif i[0] == 'GRID_ANGLE':
+            angle = float(i[1])
+            print(angle)
+        elif i[0] == 'ILB_IUB':
+            i_min = int(i[1])
+            i_max = int(i[2])
+            print("ILB_IUB ", i_min, i_max)
+        elif i[0] == 'JLB_JUB':
+            j_min = int(i[1])
+            j_max = int(i[2])
+            print("JLB_JUB ", j_min, j_max)
+        elif i[0] == 'CONSTANT_SPACING_X':
+            if int(i[1]) == 1:
+                constant_x = True
+            else:
+                constant_x = False
+        elif i[0] == 'CONSTANT_SPACING_Y':
+            if int(i[1]) == 1:
+                constant_y = True
+            else:
+                constant_y = False
+        else:
+            continue
+    
+    writer.autoBalance = 1
+    id=0
+    print(constant_x, constant_y)
+    if constant_x and constant_y:
+        for i in range(i_max):
+            for j in range(j_max):
+                id+=1
+                vertices = []
+                parts = []
+                vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy])
+                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy])
+                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy])
+                vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy])
+                parts.append(vertices)
+                writer.poly(parts)
+                writer.record(id)
+    input_f.close()
+    writer.close()
+    print('done')
+    return
+
+def main(argv):
+    inputfile = ''
+    _format = ''
+    try:
+        opts, args = getopt.getopt(argv,"hf:i:",["format=","ifile="])
+    except getopt.GetoptError:
+        print('gridConverter.py -i <inputfile>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('gridConverter.py -i <inputfile>')
+            sys.exit()
+        elif opt in ("-f", "--format"):
+            _format = arg
+        elif opt in ("-i", "--ifile"):
+            inputfile = arg
+    if _format == "nc":
+        grid2netCDF(inputfile)
+    elif _format == "shp":
+        grid2shp(inputfile)
+                                                                                                                        
+if __name__ == "__main__":
+    main(sys.argv[1:])
