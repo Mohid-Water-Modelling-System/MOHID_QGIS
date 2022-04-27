@@ -47,6 +47,7 @@ from .grid.grid_item_adder import GridColAdder, GridRowAdder
 from .grid.grid_variable_layout_field import GridVariableLayoutField
 from .grid.crs import CRS
 
+from bathymetry.bathymetryTool import BathymetryTool
 
 """
 The MohidPlugin is the main class of the plugin.
@@ -280,6 +281,7 @@ class MohidPlugin:
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
             config = self.getConfig()
             gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
+            bathymetryTool = BathymetryTool()
             self.setGridTool(gridTool)
 
             # show the dockwidget
