@@ -122,8 +122,21 @@ class GridTool:
     the grid on a layer.
     """
     def loadBtnClicked(self):
-        pass
+        filename = QFileDialog.getOpenFileName(None, 'Load grid', filter='*.dat')[0]
+        grid = Grid()
+        grid.fromGridFile(filename)
+        name = os.path.basename(filename).replace(".dat", "")
+        project = QgsProject.instance()
 
+        layers = project.mapLayersByName(name)
+        if layers:
+            for layer in layers:
+                if layer.customProperty(Grid.MohidGridLayer):
+                    grid.updateQgsVectorLayer(layer)
+                    break
+        else:
+            layer = grid.toQgsVectorLayer(name)
+            project.addMapLayer(layer)
     """
     The saveBtnClicked function is called when the save button is clicked.
     This function creates a grid from the properties entered in the form,

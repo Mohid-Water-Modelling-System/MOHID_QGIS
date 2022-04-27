@@ -1,8 +1,9 @@
 from qgis.core import QgsVectorLayer, QgsFeature
-from .grid_layout import GridLayout
+from .grid_layout import GridLayout, GridRegularLayout
 from .point import Origin
 from .crs import CRS
 from .angle import Angle
+from .gridUtils import loadFromFile
 
 
 # TODO: Remove MohidGridLayer string and bind object instance to layer
@@ -22,11 +23,16 @@ class Grid:
         - the layout of the grid, which can be regular or variable. The layout specifies how many
         rows and columns the grid has and what is the spacing between them.
     """
-    def __init__(self, crs: CRS, origin: Origin, angle: Angle, layout: GridLayout):
-        self.setCrs(crs)
-        self.setOrigin(origin)
-        self.setAngle(angle)
-        self.setLayout(layout)
+    def __init__(self, crs: CRS = None, origin: Origin = None, angle: Angle =None, layout: GridLayout =None):
+        if crs is not None:
+            self.setCrs(crs)
+        if origin is not None:
+            self.setOrigin(origin)
+        if angle is not None:
+            self.setAngle(angle)
+        if layout is not None:
+            self.setLayout(layout)
+
 
     def setCrs(self, crs: CRS):
         self.__crs = crs
@@ -116,3 +122,39 @@ class Grid:
             + crs.toString(config) + layout.toString(config)
 
         return output
+    
+    def fromGridFile(self, gridFile):
+        
+        try:
+            gridData = loadFromFile(gridFile)
+        except:
+            raise ValueError
+            #TODO: missing important parameter
+            # min max rows and columns must be present
+            # send popup message
+
+        # Go through every line
+        if gridData['SRID'] is not None:
+            self.setCrs(CRS(gridData['SRID']))
+        if gridData['ORIGIN_X'] is not None:
+            originX = gridData['ORIGIN_X']
+        if gridData['ORIGIN_Y'] is not None:
+            originY = gridData['ORIGIN_Y']
+        if gridData['GRID_ANGLE'] is not None:
+            self.setAngle(gridData['GRID_ANGLE'])
+        if gridData['COORD_TIP'] is not None:
+            coordTip = gridData['COORD_TIP']
+        self.setOrigin(Origin(originX, originY))
+
+        # Get x axis
+        if gridData['CONSTANT_SPACING_X'] and gridData['CONSTANT_SPACING_Y']:
+            # set regular layout
+            nCols = gridData['JUB'] - gridData['JLB'] + 1
+            nRows = gridData['IUB'] - gridData['ILB'] + 1
+            layout = GridRegularLayout(nCols, nRows, gridData['DX'], gridData['DY'])
+        else:
+            # set variable 
+            raise NotImplementedError
+
+        # Get Y axis
+        self.setLayout(layout)

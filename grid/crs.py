@@ -20,4 +20,4 @@ class CRS(QgsCoordinateReferenceSystem):
         if epsg not in config["CRSTypes"]:
             raise Exception("Coordinate Type not supported")
         value = config["CRSTypes"][epsg]
-        return fmt.format(key, value)
+        return fmt.format(key, value) + fmt.format("SRID", epsg.split(":")[1])

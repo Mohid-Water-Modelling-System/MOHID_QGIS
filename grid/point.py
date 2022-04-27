@@ -40,4 +40,4 @@ class Origin(Point):
         x = self.x()
         keyY = config["keys"][type(self).__name__]["y"]
         y = self.y()
-        return fmt.format(keyX, x) + fmt.format(keyY, y)
+        return fmt.format("ORIGIN", f"{x} {y}")

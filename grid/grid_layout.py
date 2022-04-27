@@ -149,9 +149,15 @@ class GridRegularLayout(GridLayout):
     the configuration provided in form of a dictionary.
     This configuration was previously read from the config.json file.
     """
-    #TODO: complete this function
+
     def toString(self, config: dict) -> str:
-        return ""
+        fmt = config["fmt"]
+        return fmt.format("CONSTANT_SPACING_X", 1) + \
+            fmt.format("CONSTANT_SPACING_Y", 1) + \
+            fmt.format("DX", self.getColSpacing()) + \
+            fmt.format("DY", self.getRowSpacing()) + \
+            fmt.format("ILB_IUB", f"1 {self.getNRows()}") + \
+            fmt.format("JLB_JUB", f"1 {self.getNCols()}")
 
 """
 The GridVariableLayout is used to build a variable spaced grid: The columns may have different
