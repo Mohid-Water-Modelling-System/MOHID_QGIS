@@ -123,6 +123,8 @@ class GridTool:
     """
     def loadBtnClicked(self):
         filename = QFileDialog.getOpenFileName(None, 'Load grid', filter='*.dat')[0]
+        if filename == "":
+            return None
         grid = Grid()
         grid.fromGridFile(filename)
         name = os.path.basename(filename).replace(".dat", "")
@@ -159,10 +161,8 @@ class GridTool:
 
         #TODO: change to with context
         if fileName:
-            f = open(fileName, "w")
-            f.write(output)
-            f.close()
-        
+            with open(fileName, "w") as f:
+                f.write(output)        
     """
     The close function deactivates the CapturePointTool.
     This function is called when the plugin is closed.

@@ -31,7 +31,6 @@ DY - Constant spacing distance in YY axis
 
 
 def grid2netCDF(input_path):
-    input_f = open(input_path, "r")
     rootgrp = netCDF4.Dataset(os.path.splitext(input_path)[0] + ".nc", "w", format="NETCDF4")
 
     is_reading = "info"
@@ -40,26 +39,27 @@ def grid2netCDF(input_path):
     y_values = []
     data_values = []
 
-    l = input_f.readline()
-    while (l != ""):
-        l = l.rstrip()
-        l = l.split(" ")
-        l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
-        if ("<BeginXX>" in l):
-            is_reading = "x"
-        elif ("<BeginYY>" in l):
-            is_reading = "y"
-        elif ("<BeginGridData2D>" in l):
-            is_reading = "data"
-        elif (is_reading == "info"):
-            info += [l]
-        elif (is_reading == "x"):
-            x_values += l
-        elif (is_reading == "y"):
-            y_values += l
-        elif (is_reading == "data"):
-            data_values += l
+    with open(input_path, "r") as input_f:
         l = input_f.readline()
+        while (l != ""):
+            l = l.rstrip()
+            l = l.split(" ")
+            l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+            if ("<BeginXX>" in l):
+                is_reading = "x"
+            elif ("<BeginYY>" in l):
+                is_reading = "y"
+            elif ("<BeginGridData2D>" in l):
+                is_reading = "data"
+            elif (is_reading == "info"):
+                info += [l]
+            elif (is_reading == "x"):
+                x_values += l
+            elif (is_reading == "y"):
+                y_values += l
+            elif (is_reading == "data"):
+                data_values += l
+            l = input_f.readline()
     
     info = [x for x in info if x != []]
 
@@ -171,9 +171,12 @@ def gridtest():
     w.close()
     return
 
-def grid2shp(input_path):
+def grid2shp(input_path, output_path = None):
+
+    if not output_path:
+        output_path = input_path
     input_f = open(input_path, "r")
-    writer = shapefile.Writer(os.path.splitext(input_path)[0])
+    writer = shapefile.Writer(os.path.splitext(output_path)[0])
     writer.field("ID", "N")
     info = []
 
@@ -271,10 +274,11 @@ def main(argv):
     inputfile = ''
     _format = ''
     try:
-        opts, args = getopt.getopt(argv,"hf:i:",["format=","ifile="])
+        opts, args = getopt.getopt(argv,"hf:i:o:",["format=","ifile=", "ofile="])
     except getopt.GetoptError:
         print('gridConverter.py -i <inputfile>')
         sys.exit(2)
+    outputfile = None
     for opt, arg in opts:
         if opt == '-h':
             print('gridConverter.py -i <inputfile>')
@@ -283,10 +287,12 @@ def main(argv):
             _format = arg
         elif opt in ("-i", "--ifile"):
             inputfile = arg
+        elif opt in ("-o", "--ofile"):
+            outputfile = arg
     if _format == "nc":
-        grid2netCDF(inputfile)
+        grid2netCDF(inputfile, outputfile)
     elif _format == "shp":
-        grid2shp(inputfile)
+        grid2shp(inputfile, outputfile)
                                                                                                                         
 if __name__ == "__main__":
     main(sys.argv[1:])

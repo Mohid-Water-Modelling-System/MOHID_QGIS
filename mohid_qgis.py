@@ -47,8 +47,14 @@ from .grid.grid_item_adder import GridColAdder, GridRowAdder
 from .grid.grid_variable_layout_field import GridVariableLayoutField
 from .grid.crs import CRS
 
-from bathymetry.bathymetryTool import BathymetryTool
-
+from .bathymetry.bathymetryTool import BathymetryTool
+import logging
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 """
 The MohidPlugin is the main class of the plugin.
 It was generated with the PBT tool and the only functions that matter to the programmer are:
@@ -68,6 +74,18 @@ class MohidPlugin:
             application at run time.
         :type iface: QgsInterface
         """
+
+        # debug
+
+        debug = False
+        waitForAttach = True
+
+        if debug:
+            import debugpy
+            debugpy.listen(address=("localhost", 8765))
+            if waitForAttach:
+                debugpy.wait_for_client()
+                # debugpy.breakpoint()
 
         # Save reference to the QGIS interface
         self.iface = iface
@@ -253,8 +271,8 @@ class MohidPlugin:
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
             pluginDir = self.getPluginDir()
-            f = open(pluginDir + '/config.json')
-            self.loadConfig(f)
+            with open(pluginDir + '/config.json') as f:
+                self.loadConfig(f)
             crs = CRS(QgsProject.instance().crs())
             crsField = self.dockwidget.mQgsProjectionSelectionWidget
             crsField.setCrs(crs)
@@ -280,8 +298,11 @@ class MohidPlugin:
             layerNameField = GridLayerNameField(self.dockwidget.lineEditLayerName, self.dockwidget.toolButtonLayerName)
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
             config = self.getConfig()
+            try:
+                bathymetryTool = BathymetryTool(self.dockwidget)
+            except Exception:
+                logger.exception("oops")
             gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
-            bathymetryTool = BathymetryTool()
             self.setGridTool(gridTool)
 
             # show the dockwidget
