@@ -14,6 +14,8 @@ handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+CRS_ID_DEFAULT = 4326
+
 class BathymetryTool:
 
     def __init__(self, dock):
@@ -62,8 +64,7 @@ class BathymetryTool:
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Grid - {filename}", "ogr")
             crs = vlayer.crs()
-            # crs.createFromId(4326) 
-            crs.EpsgCrsId = 4326  # Whatever CRS you want
+            crs.createFromId(CRS_ID_DEFAULT) 
             vlayer.setCrs(crs)
             if not vlayer:
                 print("Layer failed to load!")
@@ -88,8 +89,7 @@ class BathymetryTool:
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Bathymetry points - {filename}", "ogr")
             crs = vlayer.crs()
-            # crs.createFromId(4326) 
-            crs.EpsgCrsId = 4326  # Whatever CRS you want
+            crs.createFromId(CRS_ID_DEFAULT) 
             vlayer.setCrs(crs)
             if not vlayer:
                 print("Layer failed to load!")
@@ -107,8 +107,7 @@ class BathymetryTool:
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Land - {filename}", "ogr")
             crs = vlayer.crs()
-            # crs.createFromId(4326) 
-            crs.EpsgCrsId = 4326  # Whatever CRS you want
+            crs.createFromId(CRS_ID_DEFAULT) 
             vlayer.setCrs(crs)
             if not vlayer:
                 print("Layer failed to load!")
