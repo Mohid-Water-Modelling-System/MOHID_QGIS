@@ -1,0 +1,22 @@
+
+OUTPUT_FILE            : Tejo.grd
+ORIGIN_X               : 93000
+ORIGIN_Y               : 155000
+GRID_ANGLE             : 0.
+COORD_TIP              : 3
+
+<begin_grid_xx>
+NUMBER_OF_SEGMENTS     : 2
+NODES                  : 0.     5000   8000   
+RESOLUTION             : 300    300     30
+<end_grid_xx>
+
+
+
+<begin_grid_yy>
+NUMBER_OF_SEGMENTS     : 2
+NODES                  : 0.   700  8000       
+RESOLUTION             : 30  300    30  
+<end_grid_yy>
+
+

@@ -44,6 +44,7 @@ Once activated, a new plugin button should appear in the Toolbar.
 - [ ] Configure MOHID coordinate types in config.json
 - [ ] Remove variable layout items from layout table
 - [ ] Integrate conversions between the various formats used and mohid formats
+- [ ] Move expensive processing tasks to separate thread
 
 ## Dev environment
 
@@ -58,3 +59,22 @@ Once activated, a new plugin button should appear in the Toolbar.
 ## Grid origin
 
 Lower left corner
+
+## Load to layer support
+
+[x] - .grd
+[x] - .xy
+[x] - .xyz
+[ ] - .dat
+
+## Convert options
+
+gridConverter.py functions
+
+- grid2netcdf
+- grid2shpfile
+
+polygonConverter.py functions
+
+- 
+

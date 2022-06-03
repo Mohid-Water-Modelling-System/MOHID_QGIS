@@ -24,6 +24,7 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 
@@ -46,7 +47,7 @@ from .grid.grid_regular_layout_field import GridRegularLayoutField
 from .grid.grid_item_adder import GridColAdder, GridRowAdder
 from .grid.grid_variable_layout_field import GridVariableLayoutField
 from .grid.crs import CRS
-
+from qgis.PyQt.QtCore import QObject
 from .bathymetry.bathymetryTool import BathymetryTool
 import logging
 logger = logging.getLogger(__name__)
@@ -88,6 +89,8 @@ class MohidPlugin:
                 # debugpy.breakpoint()
 
         # Save reference to the QGIS interface
+        # time.sleep(10)
+        logger.debug("MohidPlugin init")
         self.iface = iface
 
         # initialize plugin directory
@@ -115,7 +118,8 @@ class MohidPlugin:
         # print "** INITIALIZING MohidPlugin"
 
         self.pluginIsActive = False
-        self.dockwidget = None
+        
+        # self.dockwidget = None
 
     # noinspection PyMethodMayBeStatic
 
@@ -209,6 +213,7 @@ class MohidPlugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
+        logger.debug("MohidPlugin initGui")
         icon_path = ':/plugins/mohid_qgis/icon.png'
         self.add_action(
             icon_path,
@@ -216,6 +221,8 @@ class MohidPlugin:
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        # will be set False in run()
+        self.first_start = True
     # --------------------------------------------------------------------------
 
     def onClosePlugin(self):
@@ -255,6 +262,11 @@ class MohidPlugin:
     def run(self):
         """Run method that loads and starts the plugin"""
 
+        if self.first_start == True:
+            self.first_start = False
+            # Create the dockwidget (after translation) and keep reference
+            self.dockwidget = MohidPluginDockWidget()
+
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
@@ -263,10 +275,7 @@ class MohidPlugin:
             # dockwidget may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
-                # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = MohidPluginDockWidget()
-
+            
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
@@ -298,10 +307,11 @@ class MohidPlugin:
             layerNameField = GridLayerNameField(self.dockwidget.lineEditLayerName, self.dockwidget.toolButtonLayerName)
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
             config = self.getConfig()
-            try:
-                bathymetryTool = BathymetryTool(self.dockwidget)
-            except Exception:
-                logger.exception("oops")
+            # time.sleep(20)
+            self.batTool = BathymetryTool(self.dockwidget)
+            # self.dockwidget.bat_fsBrowser.clicked.connect(self.batLoadClicked)
+            self.batTool.setIface(self.iface)
+
             gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
             self.setGridTool(gridTool)
 
@@ -309,6 +319,9 @@ class MohidPlugin:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+    
+    # def batLoadClicked(self):
+    #     logger.debug("Pressed load button")
         
     def setGridTool(self, t: GridTool):
         self.__gridTool = t
