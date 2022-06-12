@@ -2,6 +2,8 @@ import os
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
 
+from .mohidBathymetry import MOHIDBathymetry
+
 from ..utils.gridConverter import grid2shp
 from ..utils.polygonConverter import polygon2shp
 from ..utils.xyzConverter import XYZ2shp
@@ -26,9 +28,11 @@ class BathymetryTool:
         self.dock.bat_fsGrid.clicked.connect(self.openGridBrowser)
         self.dock.bat_fsXYZ.clicked.connect(self.openXYZBrowser)
         self.dock.bat_fsLand.clicked.connect(self.openLandBrowser)
+        self.dock.bat_fsBat.clicked.connect(self.openBatBrowser)
         self.dock.bat_loadGrdBtn.clicked.connect(self.loadGridToLayer)
         self.dock.bat_loadXYZBtn.clicked.connect(self.loadXYZToLayer)
         self.dock.bat_loadLandBtn.clicked.connect(self.loadLandToLayer)
+        self.dock.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
     
     def setIface(self, iface):
         logger.debug("Setting Bathymetry tool iface")
@@ -51,6 +55,12 @@ class BathymetryTool:
         filepath = QFileDialog.getOpenFileName(None, 'Load MOHID Land file', 
                             filter='Mohid files (*.xy)')[0]
         self.dock.bat_landPath.setText(filepath)
+    
+    def openBatBrowser(self):
+        logger.debug("Pressed bathymetry browser button")
+        filepath = QFileDialog.getOpenFileName(None, 'Load MOHID Bathymetry file', 
+                            filter='Mohid Bathymetry (*.dat)')[0]
+        self.dock.bat_batPath.setText(filepath)
 
     def loadGridToLayer(self):
         
@@ -70,6 +80,7 @@ class BathymetryTool:
                 print("Layer failed to load!")
         else:
             logger.debug(f"Filename is empty")
+    
     
     def loadXYZToLayer(self):
         """
@@ -113,6 +124,25 @@ class BathymetryTool:
                 print("Layer failed to load!")
         else:
             logger.debug(f"Filename is empty")
+    
+    def loadBatToLayer(self):
+        
+        filepath = self.dock.bat_batPath.text()
+        logger.debug(f"Loading {filepath}")
+        if filepath != "":
+            # check file type
+            mohidBat = MOHIDBathymetry(filepath)
+            # grid2shp(self.dock.bat_batPath.text())
+            # shpPath = self.dock.bat_batPath.text().split(".")[0] + ".shp"
+            # filename = os.path.basename(shpPath).split(".")[0]
+            # vlayer = self.iface.addVectorLayer(shpPath, f"Grid - {filename}", "ogr")
+            # crs = vlayer.crs()
+            # crs.createFromId(CRS_ID_DEFAULT) 
+            # vlayer.setCrs(crs)
+            # if not vlayer:
+            #     print("Layer failed to load!")
+            # else:
+            #     logger.debug(f"Filename is empty")
     
     def convert(self, input, convertFunction, output=None,):
 
