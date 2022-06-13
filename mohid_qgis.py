@@ -24,6 +24,7 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
+from qgis.gui import QgsMapCanvas
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -311,7 +312,10 @@ class MohidPlugin:
             self.batTool = BathymetryTool(self.dockwidget)
             # self.dockwidget.bat_fsBrowser.clicked.connect(self.batLoadClicked)
             self.batTool.setIface(self.iface)
-
+            
+            # Update bathymetry combobox when bathymetry layer changes
+            # QgsMapCanvas.layersChanged.connect(self.batTool.updatebatComboBox)
+            # self.iface.legendInterface().currentLayerChanged.connect(test)
             gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
             self.setGridTool(gridTool)
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>477</width>
-    <height>554</height>
+    <height>588</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,7 +30,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_grid">
        <attribute name="title">
@@ -540,7 +540,20 @@
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item row="1" column="1">
+              <item row="2" column="0">
+               <widget class="QLineEdit" name="lineEditOriginLatitude">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
                <widget class="QLineEdit" name="lineEditOriginLongitude">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -553,7 +566,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
+              <item row="2" column="2">
                <widget class="QToolButton" name="toolButtonCapturePoint">
                 <property name="text">
                  <string>...</string>
@@ -566,7 +579,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
+              <item row="1" column="0">
                <widget class="QLabel" name="labelLongitude">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -582,20 +595,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLineEdit" name="lineEditOriginLatitude">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
+              <item row="1" column="1">
                <widget class="QLabel" name="labelLatitude">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -932,8 +932,8 @@
        <widget class="QPushButton" name="bat_fsBat">
         <property name="geometry">
          <rect>
-          <x>310</x>
-          <y>400</y>
+          <x>320</x>
+          <y>390</y>
           <width>27</width>
           <height>26</height>
          </rect>
@@ -952,7 +952,7 @@
         <property name="geometry">
          <rect>
           <x>360</x>
-          <y>400</y>
+          <y>390</y>
           <width>71</width>
           <height>26</height>
          </rect>
@@ -965,8 +965,8 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>400</y>
-          <width>271</width>
+          <y>390</y>
+          <width>281</width>
           <height>26</height>
          </rect>
         </property>
@@ -975,6 +975,38 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bat_saveBatBtn">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>430</y>
+          <width>71</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="bat_inputLabel_5">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>430</y>
+          <width>121</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Save bathymetry</string>
         </property>
        </widget>
       </widget>

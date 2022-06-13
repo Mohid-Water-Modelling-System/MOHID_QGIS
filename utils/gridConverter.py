@@ -258,10 +258,15 @@ def grid2shp(input_path, output_path = None):
                 id+=1
                 vertices = []
                 parts = []
-                vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy])
-                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy])
-                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy])
-                vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy])
+                #
+
+                vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
+                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
+                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
+                vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
+                
+                
+                
                 parts.append(vertices)
                 writer.poly(parts)
                 writer.record(id)

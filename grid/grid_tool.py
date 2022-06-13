@@ -122,12 +122,12 @@ class GridTool:
     the grid on a layer.
     """
     def loadBtnClicked(self):
-        filename = QFileDialog.getOpenFileName(None, 'Load grid', filter='*.dat')[0]
+        filename = QFileDialog.getOpenFileName(None, 'Load grid', filter='*.grd')[0]
         if filename == "":
             return None
         grid = Grid()
         grid.fromGridFile(filename)
-        name = os.path.basename(filename).replace(".dat", "")
+        name = os.path.basename(filename).replace(".grd", "")
         project = QgsProject.instance()
 
         layers = project.mapLayersByName(name)
@@ -153,7 +153,7 @@ class GridTool:
         grid = form.toGrid()
         nameField = form.getLayerNameField()
         name = nameField.getText()
-        fileName = QFileDialog.getSaveFileName(None, 'Save grid', name +'.dat', '*.dat')[0]
+        fileName = QFileDialog.getSaveFileName(None, 'Save grid', name +'.grd', '*.grd')[0]
 
         fmt = config["fmt"]
         key = config["keys"]["fileName"]
