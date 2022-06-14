@@ -1,4 +1,5 @@
-from qgis.PyQt.QtGui import QDoubleValidator, QValidator
+from qgis.PyQt.QtGui import QValidator
+from qgis.gui import QgsDoubleValidator
 from qgis.PyQt.QtCore import QObject
 
 
@@ -8,7 +9,7 @@ It implements a validator that allows the user to input positive double values o
 This validator is used for the fields of the Grid Tool where the user enters the spacing
 of rows and columns.
 """
-class GreaterThanZeroDoubleValidator(QDoubleValidator):
+class GreaterThanZeroDoubleValidator(QgsDoubleValidator):
     """
     The GreaterThanZeroDoubleValidator constructor sets the bottom value to 0, disabling
     the user from entering negative numbers to the field (generally a QLineEdit). 

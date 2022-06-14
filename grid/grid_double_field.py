@@ -1,6 +1,6 @@
 from os import replace
 from qgis.PyQt.QtWidgets import QLineEdit
-from qgis.PyQt.QtGui import QDoubleValidator
+from qgis.gui import QgsDoubleValidator
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from ..validators.greater_than_zero_double_validator import GreaterThanZeroDoubleValidator
 
@@ -34,7 +34,7 @@ class GridDoubleField(QObject):
     When the text of the LineEdit changes, the lineEditTextChanged function is called.
     """
     def setLineEdit(self, l: QLineEdit):
-        validator = QDoubleValidator(l)
+        validator = QgsDoubleValidator(l)
         l.setValidator(validator)
         l.textChanged.connect(self.lineEditTextChanged)
         self.__lineEdit = l
