@@ -7,12 +7,10 @@ def XYZ2shp(input_path):
             writer.autoBalance = 1
             writer.field("depth", "F", size=20, decimal=8)
 
-            for line in input_f.readlines():
+            for line in input_f:
                 line = line.strip("\n")
-                if line == "<begin_xyz>":
-                    pass
-                elif line == "<end_xyz>":
-                    pass
+                if line in ["<begin_xyz>", "<end_xyz>", ""]:
+                    continue
                 else:
                     nums = list(filter(lambda x: x != '', line.split(" ")))
                     writer.record(float(nums[2]))

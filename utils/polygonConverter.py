@@ -30,46 +30,45 @@ def polygon2WKT(input_path):
     return
 
 def polygon2shp(input_path):
-    input_f = open(input_path, "r")
-    writer = shapefile.Writer(os.path.splitext(input_path)[0])
-    writer.field("name", "C")
-    poly_count = 0
-    
-    l = input_f.readline()
-    curr_polygon = []
-    coord_size = 0
-
-    while (l != ""):
-        l = l.rstrip()
-        if l == "<beginpolygon>":
+    with open(input_path, "r") as input_f:
+        with shapefile.Writer(os.path.splitext(input_path)[0]) as writer:
+            writer.field("name", "C")
+            poly_count = 0
+            
             curr_polygon = []
             coord_size = 0
-        elif l == "<endpolygon>":
-            print(curr_polygon)
-            if coord_size == 3:
-                writer.polyz([curr_polygon])
-                writer.record('polygonz ' + str(++poly_count))
-            elif coord_size == 2:
-                writer.poly([curr_polygon])
-                writer.record('polygon ' + str(++poly_count))
-        else:
-            coord = l.split(" ")
-            coord = list(filter(lambda x: x != '', coord))
-            print(coord)
-            if not curr_polygon:
-                coord_size = len(coord)
 
-            elif len(coord) != coord_size:
-                print('invalid coordinates')
-                input_f.close()
-                writer.close()
-                return
-            curr_polygon.append(list(map(float,coord)))
+            for l in input_f:
+                l = l.rstrip()
+                if l == "<beginpolygon>":
+                    curr_polygon = []
+                    coord_size = 0
+                elif l == "<endpolygon>":
+                    print(curr_polygon)
+                    if coord_size == 3:
+                        writer.polyz([curr_polygon])
+                        writer.record('polygonz ' + str(++poly_count))
+                    elif coord_size == 2:
+                        writer.poly([curr_polygon])
+                        writer.record('polygon ' + str(++poly_count))
+                elif l == "":
+                    # Ignore empty lines
+                    continue
+                else:
+                    coord = l.split(" ")
+                    coord = list(filter(lambda x: x != '', coord))
+                    print(coord)
+                    if not curr_polygon:
+                        coord_size = len(coord)
 
-        l = input_f.readline()
-    print('done')
-    input_f.close()
-    writer.close()
+                    elif len(coord) != coord_size:
+                        print('invalid coordinates')
+                        input_f.close()
+                        writer.close()
+                        return
+                    curr_polygon.append(list(map(float,coord)))
+
+            print('done')
     
     return
 

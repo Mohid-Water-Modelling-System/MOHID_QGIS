@@ -175,103 +175,100 @@ def grid2shp(input_path, output_path = None):
 
     if not output_path:
         output_path = input_path
-    input_f = open(input_path, "r")
-    writer = shapefile.Writer(os.path.splitext(output_path)[0])
-    writer.field("ID", "N")
-    info = []
+    with open(input_path, "r") as input_f:
+        with shapefile.Writer(os.path.splitext(output_path)[0]) as writer:
+            writer.field("ID", "N")
+            info = []
 
 
-    origin_x = 0.0
-    origin_y = 0.0
-    latitude = 0.0
-    longitude = 0.0
-    constant_x = True
-    constant_y = True
-    dx = 0.0
-    dy = 0.0
-    i_min = 0
-    i_max = 0
-    j_min = 0
-    j_max = 0
-    angle = 0.0
+            origin_x = 0.0
+            origin_y = 0.0
+            latitude = 0.0
+            longitude = 0.0
+            constant_x = True
+            constant_y = True
+            dx = 0.0
+            dy = 0.0
+            i_min = 0
+            i_max = 0
+            j_min = 0
+            j_max = 0
+            angle = 0.0
 
-    l = input_f.readline()
 
-    while (l != ""):
-        l = l.rstrip()
-        l = l.split(" ")
-        l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
-        info += [l]
-        l = input_f.readline()
-    print(info)
-    
-    info = [x for x in info if x != []]
-    for i in info:
-        if 'COMENT' in i[0]:
-            continue
-        elif i[0] == 'LATITUDE':
-            latitude = float(i[1])
-            print("LATITUDE ", latitude)
-        elif i[0] == 'LONGITUDE':
-            longitude = float(i[1])
-            print("LONGITUDE ", longitude)
-        elif i[0] == 'ORIGIN':
-            origin_x = float(i[1])
-            origin_y = float(i[2])
-            print(origin_x, origin_y)
-        elif i[0] == 'DX':
-            dx = float(i[1])
-            print("DX ",dx)
-        elif i[0] == 'DY':
-            dy = float(i[1])
-            print("DY ",dy)
-        elif i[0] == 'GRID_ANGLE':
-            angle = float(i[1])
-            print(angle)
-        elif i[0] == 'ILB_IUB':
-            i_min = int(i[1])
-            i_max = int(i[2])
-            print("ILB_IUB ", i_min, i_max)
-        elif i[0] == 'JLB_JUB':
-            j_min = int(i[1])
-            j_max = int(i[2])
-            print("JLB_JUB ", j_min, j_max)
-        elif i[0] == 'CONSTANT_SPACING_X':
-            if int(i[1]) == 1:
-                constant_x = True
-            else:
-                constant_x = False
-        elif i[0] == 'CONSTANT_SPACING_Y':
-            if int(i[1]) == 1:
-                constant_y = True
-            else:
-                constant_y = False
-        else:
-            continue
-    
-    writer.autoBalance = 1
-    id=0
-    print(constant_x, constant_y)
-    if constant_x and constant_y:
-        for i in range(i_max):
-            for j in range(j_max):
-                id+=1
-                vertices = []
-                parts = []
-                #
+            for l in input_f:
+                l = l.rstrip()
+                l = l.split(" ")
+                l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+                info += [l]
+            print(info)
+            
+            info = [x for x in info if x != []]
+            print(info)
+            for i in info:
+                if 'COMENT' in i[0]:
+                    continue
+                elif i[0] == 'LATITUDE':
+                    latitude = float(i[1])
+                    print("LATITUDE ", latitude)
+                elif i[0] == 'LONGITUDE':
+                    longitude = float(i[1])
+                    print("LONGITUDE ", longitude)
+                elif i[0] == 'ORIGIN':
+                    origin_x = float(i[1])
+                    origin_y = float(i[2])
+                    print(origin_x, origin_y)
+                elif i[0] == 'DX':
+                    dx = float(i[1])
+                    print("DX ",dx)
+                elif i[0] == 'DY':
+                    dy = float(i[1])
+                    print("DY ",dy)
+                elif i[0] == 'GRID_ANGLE':
+                    angle = float(i[1])
+                    print(angle)
+                elif i[0] == 'ILB_IUB':
+                    i_min = int(i[1])
+                    i_max = int(i[2])
+                    print("ILB_IUB ", i_min, i_max)
+                elif i[0] == 'JLB_JUB':
+                    j_min = int(i[1])
+                    j_max = int(i[2])
+                    print("JLB_JUB ", j_min, j_max)
+                elif i[0] == 'CONSTANT_SPACING_X':
+                    if int(i[1]) == 1:
+                        constant_x = True
+                    else:
+                        constant_x = False
+                elif i[0] == 'CONSTANT_SPACING_Y':
+                    if int(i[1]) == 1:
+                        constant_y = True
+                    else:
+                        constant_y = False
+                else:
+                    continue
+            
+            writer.autoBalance = 1
+            id=0
+            print(constant_x, constant_y)
+            if constant_x and constant_y:
+                for i in range(i_max):
+                    for j in range(j_max):
+                        id+=1
+                        vertices = []
+                        parts = []
+                        #
 
-                vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
-                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
-                vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
-                vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
-                
-                
-                
-                parts.append(vertices)
-                writer.poly(parts)
-                writer.record(id)
-    input_f.close()
-    writer.close()
+                        vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
+                        vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
+                        vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
+                        vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
+                        
+                        
+                        
+                        parts.append(vertices)
+                        writer.poly(parts)
+                        writer.record(id)
     print('done')
     return
 
