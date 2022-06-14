@@ -119,7 +119,7 @@ class MohidPlugin:
         # print "** INITIALIZING MohidPlugin"
 
         self.pluginIsActive = False
-        
+        self.loadedBatLayers = {}
         # self.dockwidget = None
 
     # noinspection PyMethodMayBeStatic
@@ -309,7 +309,7 @@ class MohidPlugin:
             form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
             config = self.getConfig()
             # time.sleep(20)
-            self.batTool = BathymetryTool(self.dockwidget)
+            self.batTool = BathymetryTool(self.dockwidget, self.loadedBatLayers)
             # self.dockwidget.bat_fsBrowser.clicked.connect(self.batLoadClicked)
             self.batTool.setIface(self.iface)
             

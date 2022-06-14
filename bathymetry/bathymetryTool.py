@@ -22,11 +22,12 @@ CRS_ID_DEFAULT = 4326
 
 class BathymetryTool:
 
-    def __init__(self, dock):
+    def __init__(self, dock, loadedBatLayers):
 
         logger.debug("Bathymetry init")
         # logger.debug(btnLoad.clicked.connect(self.loadToLayer))
         self.dock = dock
+        self.loadedBatLayers = loadedBatLayers
         self.dock.bat_fsGrid.clicked.connect(self.openGridBrowser)
         self.dock.bat_loadGrdBtn.clicked.connect(self.loadGridToLayer)
 
@@ -42,9 +43,6 @@ class BathymetryTool:
         self.dock.bat_fsBat.clicked.connect(self.openBatBrowser)
         self.dock.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
         self.dock.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
-        
-        # Finalized mohid bathymetry
-        self.mohidBat = None
         
     
     def setIface(self, iface):
@@ -176,10 +174,13 @@ class BathymetryTool:
         logger.debug(f"Loading {filepath}")
         if filepath != "":
             # check file type
-            self.mohidBat = MOHIDBathymetry(filepath)
-            MOHIDBathymetry2shp(filepath, self.mohidBat.gridData)
+            bat = MOHIDBathymetry(filepath)
+            MOHIDBathymetry2shp(filepath, bat.gridData)
             shpPath = filepath.split(".")[0] + ".shp"
-            vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Bathymetry - {self.mohidBat.filename}", "ogr")
+            vlayer = self.iface.addVectorLayer(
+                            shpPath,
+                            f"MOHID Bathymetry - {bat.filename}",
+                            "ogr")
            
             if not vlayer:
                 print("Layer failed to load!")
@@ -187,15 +188,18 @@ class BathymetryTool:
                 crs = vlayer.crs()
                 crs.createFromId(CRS_ID_DEFAULT) 
                 vlayer.setCrs(crs)
+                self.loadedBatLayers[vlayer.name()] = bat
 
         else:
             logger.debug(f"Filename is empty")
     
     def saveBatToMohidFile(self):
         
-        if self.mohidBat is None:
+        lyr = self.iface.activeLayer()
+        if lyr.name() not in self.loadedBatLayers:
             logger.debug("No bathymetry to save")
             return
+        bat = self.loadedBatLayers[lyr.name()]
         filepath = QFileDialog.getSaveFileName(None, 'Save MOHID Bathymetry file', 
                             filter='Mohid Bathymetry (*.dat)')[0]
         logger.debug(f"Will save to {filepath}")
@@ -203,15 +207,12 @@ class BathymetryTool:
             
             # TODO: for now this is sufficient, but we should choose the layer 
             # from a comboBox
-            for layer in QgsProject.instance().mapLayers().values():
-                if layer.name().startswith("MOHID Bathymetry"):
-                    vLayer = layer
-                    break
+           
             data2D = []
-            for feat in vLayer.getFeatures():
+            for feat in lyr.getFeatures():
                 data2D.append(feat.attributes()[0])
-            self.mohidBat.gridData['DATA_2D'] = data2D
-            saveToMohidFile(filepath, self.mohidBat.gridData)
+            bat.gridData['DATA_2D'] = data2D
+            saveToMohidFile(filepath, bat.gridData)
 
         else:
             logger.debug(f"Filename is empty")
