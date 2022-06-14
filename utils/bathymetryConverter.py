@@ -17,7 +17,7 @@ def saveToMohidFile(outputPath, data):
             f.write(f"JLB_JUB :      {data['JLB']} {data['JUB']}\n")
             f.write(f"COORD_TIP :    {data['COORD_TIP']}\n")
             f.write(f"ORIGIN :       {data['ORIGIN_X']} {data['ORIGIN_Y']}\n")
-            f.write(f"GRID_ANGLE :   {data['JLB']} {data['JUB']}\n")
+            f.write(f"GRID_ANGLE :   {data['GRID_ANGLE']}\n")
             f.write(f"SRID :         {data['SRID']}\n")
             f.write(f"LATITUDE :     {data['LATITUDE']}\n")
             f.write(f"LONGITUDE :    {data['LONGITUDE']}\n")
