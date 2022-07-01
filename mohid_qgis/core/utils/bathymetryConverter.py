@@ -1,6 +1,5 @@
 import shapefile
 import os
-import numpy as np
 
 def saveToMohidFile(outputPath, data):
 

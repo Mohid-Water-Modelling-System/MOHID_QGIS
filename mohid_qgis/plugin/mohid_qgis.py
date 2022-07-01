@@ -24,32 +24,15 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
-from qgis.gui import QgsMapCanvas
-
-# Initialize Qt resources from file resources.py
-from .resources import *
-
-# Import the code for the DockWidget
-from .mohid_qgis_dockwidget import MohidPluginDockWidget
-import os.path
 import json
 
-from qgis.core import QgsProject
-from .grid.grid_tool import GridTool
-from .grid.grid_form import GridForm
-from .grid.grid_layout_field import GridLayoutField
-from .grid.grid_layer_name_field import GridLayerNameField
-from .grid.capture_point_tool import CapturePointTool
-from .grid.grid_double_field import GridDoubleField, GridGreaterThanZeroDoubleField
-from .grid.grid_layout_table import GridLayoutTable
-from .grid.grid_variable_spacing_field import GridVariableSpacingField
-from .grid.grid_origin_field import GridOriginField
-from .grid.grid_regular_layout_field import GridRegularLayoutField
-from .grid.grid_item_adder import GridColAdder, GridRowAdder
-from .grid.grid_variable_layout_field import GridVariableLayoutField
-from .grid.crs import CRS
-from qgis.PyQt.QtCore import QObject
-from .bathymetry.bathymetryTool import BathymetryTool
+# Initialize Qt resources from file resources.py
+from mohid_qgis.plugin.resources.resources import *
+
+# Import the code for the DockWidget
+from mohid_qgis.plugin.base.mohid_qgis_dockwidget import MohidPluginDockWidget
+import os.path
+
 import logging
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
@@ -120,6 +103,10 @@ class MohidPlugin:
 
         self.pluginIsActive = False
         self.loadedBatLayers = {}
+        self.dockWidget = None
+        pluginDir = self.getPluginDir()
+        with open(pluginDir + '/config.json') as f:
+            self.loadConfig(f)
         # self.dockwidget = None
 
     # noinspection PyMethodMayBeStatic
@@ -232,7 +219,7 @@ class MohidPlugin:
         # print "** CLOSING MohidPlugin"
 
         # disconnects
-        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+        self.dockWidget.closingPlugin.disconnect(self.onClosePlugin)
 
         # remove this statement if dockwidget is to remain
         # for reuse if plugin is reopened
@@ -240,8 +227,12 @@ class MohidPlugin:
         # when closing the docked window:
         # self.dockwidget = None
 
-        gridTool = self.getGridTool()
-        gridTool.close()
+        # gridTool = self.getGridTool()
+        # gridTool.close()
+        # TODO: write unload functions for each tab
+        # this way future tabs dont need to touch this file
+        # for tab in tabs:
+            #tab.unload()
 
         self.pluginIsActive = False
 
@@ -257,16 +248,18 @@ class MohidPlugin:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
-
+            
     # --------------------------------------------------------------------------
 
     def run(self):
         """Run method that loads and starts the plugin"""
-
-        if self.first_start == True:
-            self.first_start = False
-            # Create the dockwidget (after translation) and keep reference
-            self.dockwidget = MohidPluginDockWidget()
+        if not self.dockWidget:
+            self.dockWidget = MohidPluginDockWidget(self.iface, 
+                                            self.dockWidget, self.getConfig())
+        # if self.first_start == True:
+        #     self.first_start = False
+        #     # Create the dockwidget (after translation) and keep reference
+        #     self.dockwidget = MohidPluginDockWidget()
 
         if not self.pluginIsActive:
             self.pluginIsActive = True
@@ -278,61 +271,37 @@ class MohidPlugin:
             #    removed on close (see self.onClosePlugin method)
             
             # connect to provide cleanup on closing of dockwidget
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+            self.dockWidget.closingPlugin.connect(self.onClosePlugin)
 
-            pluginDir = self.getPluginDir()
-            with open(pluginDir + '/config.json') as f:
-                self.loadConfig(f)
-            crs = CRS(QgsProject.instance().crs())
-            crsField = self.dockwidget.mQgsProjectionSelectionWidget
-            crsField.setCrs(crs)
-            latitudeField = GridDoubleField(self.dockwidget.lineEditOriginLatitude)
-            longitudeField = GridDoubleField(self.dockwidget.lineEditOriginLongitude)
-            capturePointTool = CapturePointTool(self.iface, crs, self.dockwidget.toolButtonCapturePoint)
-            originField = GridOriginField(latitudeField, longitudeField, capturePointTool)
-            angleField = GridDoubleField(self.dockwidget.lineEditAngle)
-            colSpacingField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditRegularColumnsSpacing)
-            rowSpacingField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditRegularRowsSpacing)
-            regularLayoutField = GridRegularLayoutField(self.dockwidget.spinBoxColumnsQuantity, self.dockwidget.spinBoxRowsQuantity, colSpacingField, rowSpacingField, self.dockwidget.labelRegularSpacing)
-            gridLayoutTable = GridLayoutTable(self.dockwidget.labelLayout, self.dockwidget.tableWidgetLayout)
-            colSpacingStartField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedColumnsSpacingStart)
-            colSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedColumnsSpacingEnd)
-            rowSpacingStartField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingStart)
-            rowSpacingEndField = GridGreaterThanZeroDoubleField(self.dockwidget.lineEditVariableSpacedRowsSpacingEnd)
-            colVariableSpacingField = GridVariableSpacingField(colSpacingStartField, colSpacingEndField)
-            rowVariableSpacingField = GridVariableSpacingField(rowSpacingStartField, rowSpacingEndField)
-            colAdder = GridColAdder(self.dockwidget.spinBoxColumnsQuantity, colVariableSpacingField, self.dockwidget.toolButtonAddColumns)
-            rowAdder = GridRowAdder(self.dockwidget.spinBoxRowsQuantity, rowVariableSpacingField, self.dockwidget.toolButtonAddRows)
-            variableLayoutField = GridVariableLayoutField(gridLayoutTable, self.dockwidget.labelSpacingRange, colAdder, rowAdder)
-            layoutField = GridLayoutField(self.dockwidget.radioButtonRegular, regularLayoutField, self.dockwidget.radioButtonVariableSpaced, variableLayoutField)
-            layerNameField = GridLayerNameField(self.dockwidget.lineEditLayerName, self.dockwidget.toolButtonLayerName)
-            form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
-            config = self.getConfig()
+            
+            
+            
+            
             # time.sleep(20)
-            self.batTool = BathymetryTool(self.dockwidget, self.loadedBatLayers)
+            # self.batTool = BathymetryTool(self.dockwidget, self.loadedBatLayers)
             # self.dockwidget.bat_fsBrowser.clicked.connect(self.batLoadClicked)
-            self.batTool.setIface(self.iface)
+            # self.batTool.setIface(self.iface)
             
             # Update bathymetry combobox when bathymetry layer changes
             # QgsMapCanvas.layersChanged.connect(self.batTool.updatebatComboBox)
             # self.iface.legendInterface().currentLayerChanged.connect(test)
-            gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
-            self.setGridTool(gridTool)
-
+            # gridTool = GridTool(form, self.dockwidget.pushButtonPreview, self.dockwidget.pushButtonLoad, self.dockwidget.pushButtonSave, config)
+            # self.setGridTool(gridTool)
+            
             # show the dockwidget
             # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
-            self.dockwidget.show()
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockWidget)
+            # self.dockwidget.show()
     
     # def batLoadClicked(self):
     #     logger.debug("Pressed load button")
         
-    def setGridTool(self, t: GridTool):
-        self.__gridTool = t
+    # def setGridTool(self, t: GridTool):
+    #     self.__gridTool = t
     
-    def getGridTool(self) -> GridTool:
-        return self.__gridTool
-    
+    # def getGridTool(self) -> GridTool:
+    #     return self.__gridTool
+
     def getPluginDir(self) -> str:
         return self.plugin_dir
     

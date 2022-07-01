@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .mohid_qgis import MohidPlugin
+    from mohid_qgis.plugin.mohid_qgis import MohidPlugin
     return MohidPlugin(iface)

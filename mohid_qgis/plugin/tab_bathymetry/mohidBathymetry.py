@@ -1,4 +1,4 @@
-from ..grid.grid import Grid
+from ..tab_grid.grid import Grid
 import os
 
 class MOHIDBathymetry(Grid):

@@ -1,13 +1,17 @@
 import os
+
+from qgis.PyQt import uic
+from PyQt5.QtWidgets import QTabWidget
+
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
 from qgis.core import QgsProject
 from .mohidBathymetry import MOHIDBathymetry
 
-from ..utils.gridConverter import grid2shp
-from ..utils.polygonConverter import polygon2shp
-from ..utils.xyzConverter import XYZ2shp
-from ..utils.bathymetryConverter import MOHIDBathymetry2shp, saveToMohidFile, \
+from mohid_qgis.core.utils.gridConverter import grid2shp
+from mohid_qgis.core.utils.polygonConverter import polygon2shp
+from mohid_qgis.core.utils.xyzConverter import XYZ2shp
+from mohid_qgis.core.utils.bathymetryConverter import MOHIDBathymetry2shp, saveToMohidFile, \
     saveGenerateMohidFile
 import logging
 
@@ -20,68 +24,69 @@ logger.addHandler(handler)
 
 CRS_ID_DEFAULT = 4326
 
-class BathymetryTool:
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'tab_bathymetry.ui'))
 
-    def __init__(self, dock, loadedBatLayers):
+class BathymetryTab(QTabWidget, FORM_CLASS):
 
-        logger.debug("Bathymetry init")
-        # logger.debug(btnLoad.clicked.connect(self.loadToLayer))
-        self.dock = dock
-        self.loadedBatLayers = loadedBatLayers
-        self.dock.bat_fsGrid.clicked.connect(self.openGridBrowser)
-        self.dock.bat_loadGrdBtn.clicked.connect(self.loadGridToLayer)
+    def __init__(self, iface) -> None:
+        super().__init__()
 
-        self.dock.bat_fsXYZ.clicked.connect(self.openXYZBrowser)
-        self.dock.bat_loadXYZBtn.clicked.connect(self.loadXYZToLayer)
+        # Setup UI elements
+        self.setupUi(self)
 
-        self.dock.bat_fsLand.clicked.connect(self.openLandBrowser)
-        self.dock.bat_loadLandBtn.clicked.connect(self.loadLandToLayer)
-
-        self.dock.bat_fsOutput.clicked.connect(self.openGenerateBrowser)
-        self.dock.bat_generateBtn.clicked.connect(self.generateBatMohidFile)
-
-        self.dock.bat_fsBat.clicked.connect(self.openBatBrowser)
-        self.dock.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
-        self.dock.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
-        
-    
-    def setIface(self, iface):
-        logger.debug("Setting Bathymetry tool iface")
         self.iface = iface
+        # Connect signals
+        self.bat_fsGrid.clicked.connect(self.openGridBrowser)
+        self.bat_loadGrdBtn.clicked.connect(self.loadGridToLayer)
 
+        self.bat_fsXYZ.clicked.connect(self.openXYZBrowser)
+        self.bat_loadXYZBtn.clicked.connect(self.loadXYZToLayer)
+
+        self.bat_fsLand.clicked.connect(self.openLandBrowser)
+        self.bat_loadLandBtn.clicked.connect(self.loadLandToLayer)
+
+        self.bat_fsOutput.clicked.connect(self.openGenerateBrowser)
+        self.bat_generateBtn.clicked.connect(self.generateBatMohidFile)
+
+        self.bat_fsBat.clicked.connect(self.openBatBrowser)
+        self.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
+        self.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
+        self.loadedBatLayers = {}
+    
     def openGridBrowser(self):
         logger.debug("Pressed Grid browser button")
         filepath = QFileDialog.getOpenFileName(None, 'Load MOHID Grid file', 
                             filter='Mohid files (*.grd)')[0]
-        self.dock.bat_gridPath.setText(filepath)
+        self.bat_gridPath.setText(filepath)
     
     def openXYZBrowser(self):
         logger.debug("Pressed XYZ browser button")
         filepath = QFileDialog.getOpenFileName(None, 'Load MOHID XYZ file', 
                             filter='Mohid files (*.xyz)')[0]
-        self.dock.bat_XYZPath.setText(filepath)
+        self.bat_XYZPath.setText(filepath)
     
     def openLandBrowser(self):
         logger.debug("Pressed browser button")
         filepath = QFileDialog.getOpenFileName(None, 'Load MOHID Land file', 
                             filter='Mohid files (*.xy)')[0]
-        self.dock.bat_landPath.setText(filepath)
+        self.bat_landPath.setText(filepath)
     
     def openBatBrowser(self):
         logger.debug("Pressed bathymetry browser button")
         filepath = QFileDialog.getOpenFileName(None, 'Load MOHID Bathymetry file', 
                             filter='Mohid Bathymetry (*.dat)')[0]
-        self.dock.bat_batPath.setText(filepath)
+        self.bat_batPath.setText(filepath)
 
     def loadGridToLayer(self):
         
-        filepath = self.dock.bat_gridPath.text()
+        filepath = self.bat_gridPath.text()
         logger.debug(f"Loading {filepath}")
         if filepath != "":
             # check file type
 
-            grid2shp(self.dock.bat_gridPath.text())
-            shpPath = self.dock.bat_gridPath.text().split(".")[0] + ".shp"
+            grid2shp(self.bat_gridPath.text())
+            shpPath = self.bat_gridPath.text().split(".")[0] + ".shp"
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Grid - {filename}", "ogr")
             
@@ -103,13 +108,13 @@ class BathymetryTool:
         -8.7500838888889    38.4880172222222    0.820
         <end_xyz>
         """
-        filepath = self.dock.bat_XYZPath.text()
+        filepath = self.bat_XYZPath.text()
         logger.debug(f"Loading {filepath}")
         if filepath != "":
             # check file type
 
-            XYZ2shp(self.dock.bat_XYZPath.text())
-            shpPath = self.dock.bat_XYZPath.text().split(".")[0] + ".shp"
+            XYZ2shp(self.bat_XYZPath.text())
+            shpPath = self.bat_XYZPath.text().split(".")[0] + ".shp"
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Bathymetry points - {filename}", "ogr")
 
@@ -123,13 +128,13 @@ class BathymetryTool:
             logger.debug(f"Filename is empty")
     
     def loadLandToLayer(self):
-        filepath = self.dock.bat_landPath.text()
+        filepath = self.bat_landPath.text()
         logger.debug(f"Loading {filepath}")
         if filepath != "":
             # check file type
 
-            polygon2shp(self.dock.bat_landPath.text())
-            shpPath = self.dock.bat_landPath.text().split(".")[0] + ".shp"
+            polygon2shp(self.bat_landPath.text())
+            shpPath = self.bat_landPath.text().split(".")[0] + ".shp"
             filename = os.path.basename(shpPath).split(".")[0]
             vlayer = self.iface.addVectorLayer(shpPath, f"Land - {filename}", "ogr")
             
@@ -145,10 +150,10 @@ class BathymetryTool:
     def openGenerateBrowser(self):
         filepath = QFileDialog.getSaveFileName(None, 'Generate MOHID Bathymetry file', 
                             filter='Mohid Bathymetry (*.dat)')[0]
-        self.dock.bat_outputPath.setText(filepath)
+        self.bat_outputPath.setText(filepath)
 
     def generateBatMohidFile(self):
-        filepath = self.dock.bat_outputPath.text()
+        filepath = self.bat_outputPath.text()
         logger.debug(f"Loading {filepath}")
         
         if filepath.endswith(".dat"):
@@ -157,9 +162,9 @@ class BathymetryTool:
         else:
             outPath = f"{filepath}_createBathymetry.dat"
 
-        gridPath = self.dock.bat_gridPath.text()
-        xyzPath = self.dock.bat_XYZPath.text()
-        landPath = self.dock.bat_landPath.text()
+        gridPath = self.bat_gridPath.text()
+        xyzPath = self.bat_XYZPath.text()
+        landPath = self.bat_landPath.text()
 
         # TODO: get options
         if gridPath and xyzPath:
@@ -170,7 +175,7 @@ class BathymetryTool:
 
     def loadBatToLayer(self):
         
-        filepath = self.dock.bat_batPath.text()
+        filepath = self.bat_batPath.text()
         logger.debug(f"Loading {filepath}")
         if filepath != "":
             # check file type
@@ -222,7 +227,7 @@ class BathymetryTool:
         pass
         # for layer in QgsProject.instance().mapLayers().values():
         #     if layer.name().startswith("MOHID Bathymetry"):
-        #         self.dock.bat_layerComboBox.addItem(layer.name(), layer)
+        #         self.bat_layerComboBox.addItem(layer.name(), layer)
         # QgsProject.instance().mapLayersByName("Mohid")
     
     def convert(self, input, convertFunction, output=None,):

@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Testing shapefiles
+
+*.shx
+*.shp
+*.dbf
