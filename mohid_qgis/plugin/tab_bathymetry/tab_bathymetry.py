@@ -13,6 +13,7 @@ from mohid_qgis.core.utils.polygonConverter import polygon2shp
 from mohid_qgis.core.utils.xyzConverter import XYZ2shp
 from mohid_qgis.core.utils.bathymetryConverter import MOHIDBathymetry2shp, saveToMohidFile, \
     saveGenerateMohidFile
+from mohid_qgis.plugin.base.thread import ProgramThread
 import logging
 
 logger = logging.getLogger(__name__)
@@ -148,30 +149,38 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
             logger.debug(f"Filename is empty")
     
     def openGenerateBrowser(self):
+        # filepath = QFileDialog.getExistingDirectory(None, "Select output Directory")
         filepath = QFileDialog.getSaveFileName(None, 'Generate MOHID Bathymetry file', 
                             filter='Mohid Bathymetry (*.dat)')[0]
         self.bat_outputPath.setText(filepath)
 
     def generateBatMohidFile(self):
         filepath = self.bat_outputPath.text()
-        logger.debug(f"Loading {filepath}")
+        logger.debug(f"Saving bathymetry to {filepath}")
         
         if filepath.endswith(".dat"):
-            elems = filepath.split(".")
-            outPath = f"{elems[0]}_createBathymetry.dat"
+            outPath = filepath
         else:
-            outPath = f"{filepath}_createBathymetry.dat"
+            outPath = f"{filepath}.dat"
 
         gridPath = self.bat_gridPath.text()
         xyzPath = self.bat_XYZPath.text()
         landPath = self.bat_landPath.text()
 
+        DTCdir = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
+                                            '../..',
+                                            'core/Digital_Terrain_Creator/'))
+        DTCOptionsPath = os.path.join(DTCdir, "CreateBathymetry")
         # TODO: get options
+        # Generate CreateBathymetry.dat options file
         if gridPath and xyzPath:
-            saveGenerateMohidFile(outPath, gridPath, xyzPath, landPath)
+            saveGenerateMohidFile(DTCOptionsPath, gridPath, xyzPath, landPath)
         else:
-            logger.debug("Cant generate bathymetry, missing files")
+            logger.debug("Can't generate bathymetry, missing files")
 
+        if os.path.exists(DTCOptionsPath):
+            # Run DTC tool
+            self._runDigitalTerrain()
 
     def loadBatToLayer(self):
         
@@ -240,3 +249,32 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
     def loadLayer(self):
         raise NotImplementedError
+
+    def _runDigitalTerrain(self):
+        # TODO: remove hardcoded configurations after implementing options solution
+        DTCpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
+        '../..',
+        'core/Digital_Terrain_Creator/DigitalTerrainCreator_release_double_x64.exe'))
+        thread = ProgramThread(DTCpath)
+
+        def on_output(out: str) -> None:
+            logger.debug("on_output callback")
+            # self.stdout_textarea.appendPlainText(out)
+            # vert_scrollbar = self.stdout_textarea.verticalScrollBar()
+            # vert_scrollbar.setValue(vert_scrollbar.maximum())
+
+        def on_finished() -> None:
+            # When lines come in fast, then the highlighter is not called on each line.
+            # Re-highlighting at the end is a work-around to at least have correct
+            # highlighting after program termination.
+            # self.stdout_highlighter.rehighlight()
+            logger.debug("on_finished callback")
+            if thread.exc_info:
+                # on_done(path, None)
+                raise thread.exc_info[0].with_traceback(*thread.exc_info[1:])
+            # on_done(path, thread.error)
+        thread.output.connect(on_output)
+        thread.finished.connect(on_finished)
+        thread.start()
+        # so that we can kill the program later if requested
+        self.thread = thread

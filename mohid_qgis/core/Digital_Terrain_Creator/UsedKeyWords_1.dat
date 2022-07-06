@@ -1,0 +1,45 @@
+ BATIM_FILE                DigitalTerrainCreator     Do not have               From File                 Teste.dat                                                    YES
+ GRID_FILE                 DigitalTerrainCreator     Do not have               From File                 Teste.grd                                                    YES
+ ILB_IUB                   HorizontalGrid            Do not have               From File                 1 7                                                          YES
+ JLB_JUB                   HorizontalGrid            Do not have               From File                 1 4                                                          YES
+ HALOPOINTS                HorizontalGrid            3                         From File                 3                                                            YES
+ COORD_TIP                 HorizontalGrid            Do not have               From File                 4                                                            YES
+ LATITUDE                  HorizontalGrid            Do not have               From File                 38.4386000000000                                             YES
+ LONGITUDE                 HorizontalGrid            Do not have               From File                 -9.84350000000000                                            YES
+ DATUM                     HorizontalGrid            3                         From File                 3                                                            YES
+ EASTING                   HorizontalGrid            0.00000000000000          From File                 0.00000000000000                                             YES
+ NORTHING                  HorizontalGrid            0.00000000000000          From File                 0.00000000000000                                             YES
+ PROJ_TYPE                 HorizontalGrid            11                        From File                 11                                                           YES
+ SP1                       HorizontalGrid            30.0000000000000          From File                 30.0000000000000                                             YES
+ SP2                       HorizontalGrid            60.0000000000000          From File                 60.0000000000000                                             YES
+ ORIGIN                    HorizontalGrid            Do not have               From File                 -8.75400000000000 38.4800000000000                           YES
+ GRID_ANGLE                HorizontalGrid            0.00000000000000          From File                 0.00000000000000                                             YES
+ CONSTANT_SPACING_Y        Unknown Client            Do not have               From File                 TRUE                                                         YES
+ DY                        Unknown Client            Do not have               From File                 2.000000000000000E-003                                       YES
+ CONSTANT_SPACING_X        Unknown Client            Do not have               From File                 TRUE                                                         YES
+ DX                        Unknown Client            Do not have               From File                 2.000000000000000E-003                                       YES
+ BORDER_LIMITS             ModuleHorizontalGrid      Do not have               From File                                                                              YES
+ BATIM_INI                 DigitalTerrainCreator     Do not have               From File                 ************                                                 YES
+ POINTS_FOR_INTERPOLATION  DigitalTerrainCreator     1                         From File                 3                                                            YES
+ CANONIC_SPACE             DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ SECTION_COMPUTE           DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ FILTER_DEPTHS             DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ FILTER_RADIUS_J           DigitalTerrainCreator     1                         From File                 1                                                            YES
+ FILTER_SPIKES             DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ SPIKES_FACTOR             DigitalTerrainCreator     10.0000000000000          From File                 10.0000000000000                                             YES
+ FILTER_RADIUS_I           DigitalTerrainCreator     1                         From File                 1                                                            YES
+ EXPAND_GRID_LIMITS        DigitalTerrainCreator     FALSE                     From File                 TRUE                                                         YES
+ GRID_LIMITS_PERCENTAGE    DigitalTerrainCreator     0.00000000000000          From File                 0.250000000000000                                            YES
+ SMOOTH                    DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ NO_DATA_POINT             DigitalTerrainCreator     -999.000000000000         From File                 -999.000000000000                                            YES
+ INVALID_Z_VALUE           DigitalTerrainCreator     -9.900000000000000E+015   From File                 -9.900000000000000E+015                                      YES
+ LAND_POINT                DigitalTerrainCreator     -99.0000000000000         From File                 -99.0000000000000                                            YES
+ DEPTH_REFERENTIAL         DigitalTerrainCreator     1.00000000000000          From File                 1.00000000000000                                             YES
+ UNIT_FACTOR               DigitalTerrainCreator     1.00000000000000          From File                 1.00000000000000                                             YES
+ ADD_FACTOR                DigitalTerrainCreator     0.00000000000000          From File                 0.00000000000000                                             YES
+ INTERPOLATION             DigitalTerrainCreator     No Interpolation          From File                 No Interpolation                                             YES
+ ASSUME_LAND_DEPTH         DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ OVERLAPPING               DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
+ MATCH_IN                  DigitalTerrainCreator     TRUE                      From File                 TRUE                                                         YES
+ FILL_METHOD               DigitalTerrainCreator     1                         From File                 1                                                            YES
+ EXPORT_XYZ                DigitalTerrainCreator     FALSE                     From File                 FALSE                                                        YES
