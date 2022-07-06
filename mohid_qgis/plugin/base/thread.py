@@ -12,7 +12,7 @@ _THREADS = [] # type: List[QThread]
 class ProgramThread(QThread):
     output = pyqtSignal(str)
 
-    def __init__(self, path: str, args: Optional[List[str]]) -> None:
+    def __init__(self, path: str, args: Optional[List[str]] = None) -> None:
         super().__init__()
         self.path = path
         self.pid = -1
