@@ -53,6 +53,20 @@ Once activated, a new plugin button should appear in the Toolbar.
 ## Issues
 
 - Double validation is unstable, validates only comma separated values, but then it can't convert them to strings
+- CRSTypes do not correspond to COORD_TIP correctly
+
+    COORD_TIP
+    ```
+    1 - Geographic coordinates
+    2 - UTM coordinates
+    3 - Portuguese military coordinates
+    4 - Simplified geographic coordinates: in Degrees
+    5 - Metric coordinates referred to the origin of the grid
+    6 - Circular coordinates
+    7 - NRLD - Dutch metric coordinate system
+    ```
+
+    For now, grid will default to COORD_TIP 4.
 
 # Plugin
 

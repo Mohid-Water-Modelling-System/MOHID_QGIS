@@ -155,13 +155,11 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         self.bat_outputPath.setText(filepath)
 
     def generateBatMohidFile(self):
-        filepath = self.bat_outputPath.text()
-        logger.debug(f"Saving bathymetry to {filepath}")
+        batPath = self.bat_outputPath.text()
+        logger.debug(f"Saving bathymetry to {batPath}")
         
-        if filepath.endswith(".dat"):
-            outPath = filepath
-        else:
-            outPath = f"{filepath}.dat"
+        if not batPath.endswith(".dat"):
+            batPath = f"{batPath}.dat"
 
         gridPath = self.bat_gridPath.text()
         xyzPath = self.bat_XYZPath.text()
@@ -170,16 +168,17 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         DTCdir = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
                                             '../..',
                                             'core/Digital_Terrain_Creator/'))
-        DTCOptionsPath = os.path.join(DTCdir, "CreateBathymetry")
+        DTCOptionsPath = os.path.join(DTCdir, "CreateBathymetry.dat")
         # TODO: get options
         # Generate CreateBathymetry.dat options file
         if gridPath and xyzPath:
-            saveGenerateMohidFile(DTCOptionsPath, gridPath, xyzPath, landPath)
+            saveGenerateMohidFile(DTCOptionsPath, batPath, gridPath, xyzPath, landPath)
         else:
             logger.debug("Can't generate bathymetry, missing files")
 
         if os.path.exists(DTCOptionsPath):
             # Run DTC tool
+            logger.debug("Running DTC")
             self._runDigitalTerrain()
 
     def loadBatToLayer(self):

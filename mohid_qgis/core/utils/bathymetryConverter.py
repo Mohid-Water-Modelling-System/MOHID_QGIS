@@ -45,10 +45,10 @@ def saveToMohidFile(outputPath, data):
             # logger.debug("Something went wrong saving to mohid file")
             pass
 
-def saveGenerateMohidFile(filepath, gridPath, xyzPath, landPath = None):
+def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPath, landPath = None):
     
-    with open(filepath, "w") as f:
-        f.write(f"BATIM_FILE: {filepath}\n")
+    with open(outPath, "w") as f:
+        f.write(f"BATIM_FILE: {batFilepath}\n")
         f.write("\n")
         f.write(f"GRID_FILE: {gridPath}\n")
         f.write("\n")
