@@ -11,7 +11,7 @@ def runExternalProgram(exePath: str, exeArgs: Optional[List[str]]):
     args = [exePath]
     if exeArgs:
         args.append(*args)
-    process = subprocess.Popen(args, cwd=os.get_cwd(),
+    process = subprocess.Popen(args, cwd=os.getcwd(),
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                              bufsize=1, universal_newlines=True)
     
