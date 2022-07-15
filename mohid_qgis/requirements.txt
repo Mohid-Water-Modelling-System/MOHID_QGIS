@@ -1,0 +1,6 @@
+debugpy
+
+# CONVERSIONS
+
+PyShp
+netcdf4
