@@ -61,7 +61,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         vlayer = self.bat_gridBox.currentData()
         item = QTreeWidgetItem(self.bat_gridTree)
         item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Grid - ", ""))
-        item.setText(1, vlayer.source())
+        item.setText(1, vlayer.source().replace(".shp", ".grd"))
     
     def removeGridLayer(self):
 
@@ -94,7 +94,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         vlayer = self.bat_XYZBox.currentData()
         item = QTreeWidgetItem(self.bat_xyzTree)
         item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Points - ", ""))
-        item.setText(1, vlayer.source())
+        item.setText(1, vlayer.source().replace(".shp", ".xyz"))
     
     def removeXYZLayer(self):
 
@@ -121,7 +121,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         vlayer = self.bat_landBox.currentData()
         item = QTreeWidgetItem(self.bat_landTree)
         item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Land - ", ""))
-        item.setText(1, vlayer.source())
+        item.setText(1, vlayer.source().replace(".shp", ".xy"))
     
     def removeLandLayer(self):
 
@@ -271,6 +271,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
     def _runDigitalTerrain(self):
         # TODO: remove hardcoded configurations after implementing options solution
+        # Check the other plugin to see how output is passed
         DTCpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
         '../..',
         'core/Digital_Terrain_Creator/DigitalTerrainCreator_release_double_x64.exe'))
