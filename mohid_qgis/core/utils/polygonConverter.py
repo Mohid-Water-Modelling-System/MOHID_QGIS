@@ -70,7 +70,7 @@ def polygon2shp(input_path):
 
             print('done')
     
-    return
+    return f"{os.path.splitext(input_path)[0]}.shp" 
 
 def main(argv):
     inputfile = ''

@@ -5,6 +5,8 @@ import getopt
 import netCDF4
 import math
 import numpy as np
+import logging
+logger = logging.getLogger(__name__)
 """
 LB_IUB - Two integer numbers defining the minimum and maximum I values along the Y-axis of the grid.
 JLB_JUB - Two integer numbers defining the minimum and maximum J values along the X-axis of the grid.
@@ -144,6 +146,7 @@ def grid2netCDF(input_path):
 
 
 def gridtest():
+    logger.debug("Grid test is being called for some unknown reason")
     minx,maxx,miny,maxy = 38.4386, 48.75, -9.8435, 10.1
     dx = 1
     dy = 1
@@ -175,102 +178,149 @@ def grid2shp(input_path, output_path = None):
 
     if not output_path:
         output_path = input_path
-    with open(input_path, "r") as input_f:
-        with shapefile.Writer(os.path.splitext(output_path)[0]) as writer:
-            writer.field("ID", "N")
-            info = []
-
-
-            origin_x = 0.0
-            origin_y = 0.0
-            latitude = 0.0
-            longitude = 0.0
-            constant_x = True
-            constant_y = True
-            dx = 0.0
-            dy = 0.0
-            i_min = 0
-            i_max = 0
-            j_min = 0
-            j_max = 0
-            angle = 0.0
-
-
-            for l in input_f:
-                l = l.rstrip()
-                l = l.split(" ")
-                l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
-                info += [l]
-            print(info)
-            
-            info = [x for x in info if x != []]
-            print(info)
-            for i in info:
-                if 'COMENT' in i[0]:
-                    continue
-                elif i[0] == 'LATITUDE':
-                    latitude = float(i[1])
-                    print("LATITUDE ", latitude)
-                elif i[0] == 'LONGITUDE':
-                    longitude = float(i[1])
-                    print("LONGITUDE ", longitude)
-                elif i[0] == 'ORIGIN':
-                    origin_x = float(i[1])
-                    origin_y = float(i[2])
-                    print(origin_x, origin_y)
-                elif i[0] == 'DX':
-                    dx = float(i[1])
-                    print("DX ",dx)
-                elif i[0] == 'DY':
-                    dy = float(i[1])
-                    print("DY ",dy)
-                elif i[0] == 'GRID_ANGLE':
-                    angle = float(i[1])
-                    print(angle)
-                elif i[0] == 'ILB_IUB':
-                    i_min = int(i[1])
-                    i_max = int(i[2])
-                    print("ILB_IUB ", i_min, i_max)
-                elif i[0] == 'JLB_JUB':
-                    j_min = int(i[1])
-                    j_max = int(i[2])
-                    print("JLB_JUB ", j_min, j_max)
-                elif i[0] == 'CONSTANT_SPACING_X':
-                    if int(i[1]) == 1:
-                        constant_x = True
+    logger.info(f"Converting {input_path} to shapefile")
+    try:
+        with open(input_path, "r") as input_f:
+            with shapefile.Writer(os.path.splitext(output_path)[0]) as writer:
+                writer.field("ID", "N")
+                origin_x = 0.0
+                origin_y = 0.0
+                latitude = 0.0
+                longitude = 0.0
+                constant_x = False
+                constant_y = False
+                dx = 0.0
+                dy = 0.0
+                i_min = 0
+                i_max = 0
+                j_min = 0
+                j_max = 0
+                angle = 0.0
+                POINTS_XX = []
+                POINTS_YY = []
+                # for l in input_f:
+                #     l = l.rstrip()
+                #     l = l.split(" ")
+                #     l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+                #     info += [l]
+                
+                # info = [x for x in info if x != []]
+                logger.debug("MOHID Grid parameters:")
+                for line in input_f:
+                    line = line.strip('\n').split(" ")
+                    i = list(filter(lambda x: x not in ('',':','\t','\n'), line))
+                    
+                    if not i:
+                        continue
+                    elif 'COMENT' in i[0]:
+                        continue
+                    elif i[0] == 'LATITUDE':
+                        latitude = float(i[1])
+                        logger.debug(f"LATITUDE: {latitude}")
+                    elif i[0] == 'LONGITUDE':
+                        longitude = float(i[1])
+                        logger.debug(f"LONGITUDE: {longitude}")
+                    elif i[0] == 'ORIGIN':
+                        origin_x = float(i[1])
+                        origin_y = float(i[2])
+                        logger.debug(f"Origin: {origin_x}, {origin_y}")
+                    elif i[0] == 'DX':
+                        dx = float(i[1])
+                        logger.debug(f"DX: {dx}")
+                    elif i[0] == 'DY':
+                        dy = float(i[1])
+                        logger.debug(f"DY {dy}")
+                    elif i[0] == 'GRID_ANGLE':
+                        angle = float(i[1])
+                        logger.debug(f"Angle: {angle}")
+                    elif i[0] == 'ILB_IUB':
+                        i_min = int(i[1])
+                        i_max = int(i[2])
+                        logger.debug(f"ILB_IUB: {i_min}, {i_max}")
+                    elif i[0] == 'JLB_JUB':
+                        j_min = int(i[1])
+                        j_max = int(i[2])
+                        logger.debug(f"JLB_JUB {j_min}, {j_max}")
+                    elif i[0] == 'CONSTANT_SPACING_X':
+                        if int(i[1]) == 1:
+                            constant_x = True
+                        else:
+                            constant_x = False
+                    elif i[0] == 'CONSTANT_SPACING_Y':
+                        if int(i[1]) == 1:
+                            constant_y = True
+                        else:
+                            constant_y = False
+                    elif i[0] == "<BeginXX>":
+                        # Read block of points
+                        isPoint = True
+                        while isPoint:
+                            line = next(input_f).strip('\n').split(" ")
+                            i = list(filter(
+                                lambda x: x not in ('',':','\t','\n'), line))
+                            if i[0] == "<EndXX>":
+                                isPoint = False
+                            else:
+                                POINTS_XX.append(float(i[0]))
+                    elif i[0] == "<BeginYY>":
+                        # Read block of points
+                        isPoint = True
+                        while isPoint:
+                            line = next(input_f).strip('\n').split(" ")
+                            i = list(filter(
+                                lambda x: x not in ('',':','\t','\n'), line))
+                            if i[0] == "<EndYY>":
+                                isPoint = False
+                            else:
+                                POINTS_YY.append(float(i[0]))
                     else:
-                        constant_x = False
-                elif i[0] == 'CONSTANT_SPACING_Y':
-                    if int(i[1]) == 1:
-                        constant_y = True
-                    else:
-                        constant_y = False
+                        continue
+                writer.autoBalance = 1
+                id=0
+                if constant_x and constant_y:
+                    # Regular grid, built with DX, DY intervals
+                    logger.info("Converting Regular Grid")
+                    for i in range(i_max):
+                        for j in range(j_max):
+                            id+=1
+                            vertices = []
+                            parts = []
+                            
+                            vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
+                            vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
+                            vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
+                            vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
+                            
+                            parts.append(vertices)
+                            writer.poly(parts)
+                            writer.record(id)
+                elif POINTS_XX and POINTS_YY:
+                    # Irregular grid, built with XX and YY points
+                    logger.info("Converting Irregular Grid")
+                    for i in range(i_max):
+                        for j in range(j_max):
+                            id+=1
+                            vertices = []
+                            parts = []
+                            
+                            # Cell vertices
+                            # Special attention to first cell of each row
+                            vertices.append([origin_x + POINTS_XX[j], origin_y + POINTS_YY[i]])     # Bottom left corner
+                            vertices.append([origin_x + POINTS_XX[j + 1], origin_y + POINTS_YY[i]]) # Bottom rigth corner
+                            vertices.append([origin_x + POINTS_XX[j + 1], origin_y + POINTS_YY[i + 1]]) # # Top rigth corner
+                            vertices.append([origin_x + POINTS_XX[j], origin_y + POINTS_YY[i + 1]]) # Top left corner
+                            
+                            parts.append(vertices)
+                            writer.poly(parts)
+                            writer.record(id)
                 else:
-                    continue
-            
-            writer.autoBalance = 1
-            id=0
-            print(constant_x, constant_y)
-            if constant_x and constant_y:
-                for i in range(i_max):
-                    for j in range(j_max):
-                        id+=1
-                        vertices = []
-                        parts = []
-                        #
-
-                        vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
-                        vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
-                        vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
-                        vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
-                        
-                        
-                        
-                        parts.append(vertices)
-                        writer.poly(parts)
-                        writer.record(id)
-    print('done')
-    return
+                    logger.warning("Invalid grid file")
+                    return None
+        logger.info(f"Successfully converted grid to shapefile {os.path.splitext(output_path)[0]}.shp")
+        return f"{os.path.splitext(output_path)[0]}.shp"
+    except Exception:
+        logger.exception("Unable to convert grid file to shapefile")
+        return None
 
 def main(argv):
     inputfile = ''

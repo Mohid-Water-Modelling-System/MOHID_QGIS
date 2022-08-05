@@ -21,67 +21,72 @@ logger = logging.getLogger(__name__)
 CRS_ID_DEFAULT = 4326
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'tab_bathymetry.ui'))
+    os.path.dirname(__file__), 'tab_load.ui'))
 
-class BathymetryTab(QTabWidget, FORM_CLASS):
+class LoadTab(QTabWidget, FORM_CLASS):
 
     def __init__(self, iface) -> None:
         super().__init__()
-        logger.debug("Bathymetry tab init")
+        logger.debug("Load tab init")
         # Setup UI elements
         self.setupUi(self)
 
         self.iface = iface
         # Connect signals
         # self.bat_fsGrid.clicked.connect(self.openGridBrowser)
-        self.bat_loadGrdBtn.clicked.connect(self.addGridToLayer)
-        self.bat_removeGrdBtn.clicked.connect(self.removeGridLayer)
+        self.bat_loadGrdBtn.clicked.connect(self.loadGridToLayer)
+        # self.bat_removeGrdBtn.clicked.connect(self.removeGridLayer)
 
         # self.bat_fsXYZ.clicked.connect(self.openXYZBrowser)
-        self.bat_loadXYZBtn.clicked.connect(self.addXYZToLayer)
-        self.bat_removeXYZBtn.clicked.connect(self.removeXYZLayer)
+        self.bat_loadXYZBtn.clicked.connect(self.loadXYZToLayer)
+        # self.bat_removeXYZBtn.clicked.connect(self.removeXYZLayer)
 
         # self.bat_fsLand.clicked.connect(self.openLandBrowser)
-        self.bat_loadLandBtn.clicked.connect(self.addLandToLayer)
-        self.bat_removeLandBtn.clicked.connect(self.removeLandLayer)
+        self.bat_loadLandBtn.clicked.connect(self.loadLandToLayer)
+        # self.bat_removeLandBtn.clicked.connect(self.removeLandLayer)
 
-        self.bat_fsOutput.clicked.connect(self.openGenerateBrowser)
-        self.bat_generateBtn.clicked.connect(self.generateBatMohidFile)
+        # self.bat_fsOutput.clicked.connect(self.openGenerateBrowser)
+        # self.bat_generateBtn.clicked.connect(self.generateBatMohidFile)
 
         # self.bat_fsBat.clicked.connect(self.openBatBrowser)
         self.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
         self.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
-        QgsProject.instance().layersAdded.connect(self.updatebatComboBoxes)
-        QgsProject.instance().layersRemoved.connect(self.updatebatComboBoxes)
         self.loadedBatLayers = {}     
 
-    def addGridToLayer(self):
-        logger.debug("Pressed Grid Add button")
-        
-        vlayer = self.bat_gridBox.currentData()
-        item = QTreeWidgetItem(self.bat_gridTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Grid - ", ""))
-        item.setText(1, vlayer.source())
-    
-    def removeGridLayer(self):
+    def loadGridToLayer(self):
+        logger.debug("Pressed Grid Load button")
+        file = QFileDialog.getOpenFileName(None, 'Load MOHID Grid file', 
+                            filter='Mohid file (*.grd)')[0]
+        # for file in filepaths:
+            # TODO: Verify is layer is already loaded
+            # Add item to item tree
+            # item = QTreeWidgetItem(self.bat_gridTree)
+            # item.setText(0, os.path.basename(file))
+            # item.setText(1, file)
 
-        selItems = self.bat_gridTree.selectedItems()
-        # Check if any layer is selected
-        if not selItems:
-            # TODO: add message for no layers selected
-            return
-        # Invisible parent item
-        root = self.bat_gridTree.invisibleRootItem()
-        for item in selItems:
-            # Remove item from item tree
-            root.removeChild(item)
-            # Remove layer
-            # lyrName = f'Grid - {os.path.basename(item.text(0)).split(".")[0]}'
-            # layers = QgsProject.instance().mapLayersByName(lyrName)
-            # for lyr in layers:
-            #     QgsProject.instance().removeMapLayer(lyr.id())
+            # Load grid layer
+        logger.debug(f"Loading {file}")
+        if file != "":
+            # check file type
 
-    def addXYZToLayer(self):
+            # Convert grid to shapefile
+            shpPath = grid2shp(file)
+            if not shpPath:
+                return
+            # shpPath = self.bat_gridPath.text().split(".")[0] + ".shp"
+            filename = os.path.basename(shpPath).split(".")[0]
+            vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Grid - {filename}", "ogr")
+            
+            if not vlayer:
+                logger.warning("Grid layer failed to load")
+            else:
+                crs = vlayer.crs()
+                crs.createFromId(CRS_ID_DEFAULT) 
+                vlayer.setCrs(crs)
+        else:
+            logger.debug(f"Filename is empty")
+
+    def loadXYZToLayer(self):
         """
         .xyz file contents:
         latitude longitude attribute
@@ -89,57 +94,63 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         -8.7500838888889    38.4880172222222    0.820
         <end_xyz>
         """
-        logger.debug("Pressed XYZ Add button")
+        logger.debug("Pressed XYZ Load button")
+        file = QFileDialog.getOpenFileName(None, 'Load MOHID XYZ file', 
+                            filter='Mohid file (*.xyz)')[0]
+        # for file in filepaths:
+            # TODO: Verify is layer is already loaded
+            # Add item to item tree
+            # item = QTreeWidgetItem(self.bat_xyzTree)
+            # item.setText(0, os.path.basename(file))
+            # item.setText(1, file)
+
+        logger.debug(f"Loading {file}")
         
-        vlayer = self.bat_XYZBox.currentData()
-        item = QTreeWidgetItem(self.bat_xyzTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Points - ", ""))
-        item.setText(1, vlayer.source())
-    
-    def removeXYZLayer(self):
+        if file != "":
+            # check file type
 
-        selItems = self.bat_xyzTree.selectedItems()
-        # Check if any layer is selected
-        if not selItems:
-            # TODO: add message for no layers selected
-            return
-        # Invisible parent item
-        root = self.bat_xyzTree.invisibleRootItem()
-        for item in selItems:
-            # Remove item from item tree
-            root.removeChild(item)
-            # Remove layer
-            # lyrName = f'Bathymetry points - {os.path.basename(item.text(0)).split(".")[0]}'
-            # layers = QgsProject.instance().mapLayersByName(lyrName)
-            # for lyr in layers:
-            #     QgsProject.instance().removeMapLayer(lyr.id())
+            shpPath = XYZ2shp(file)
+            # shpPath = self.bat_XYZPath.text().split(".")[0] + ".shp"
+            filename = os.path.basename(shpPath).split(".")[0]
+            vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Points - {filename}", "ogr")
 
-    def addLandToLayer(self):
+            if not vlayer:
+                print("Layer failed to load!")
+            else:
+                crs = vlayer.crs()
+                crs.createFromId(CRS_ID_DEFAULT) 
+                vlayer.setCrs(crs)
+        else:
+            logger.debug(f"Filename is empty")
 
-        logger.debug("Pressed Land Add button")
-        
-        vlayer = self.bat_landBox.currentData()
-        item = QTreeWidgetItem(self.bat_landTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Land - ", ""))
-        item.setText(1, vlayer.source())
-    
-    def removeLandLayer(self):
+    def loadLandToLayer(self):
 
-        selItems = self.bat_landTree.selectedItems()
-        # Check if any layer is selected
-        if not selItems:
-            # TODO: add message for no layers selected
-            return
-        # Invisible parent item
-        root = self.bat_landTree.invisibleRootItem()
-        for item in selItems:
-            # Remove item from item tree
-            root.removeChild(item)
-            # Remove layer
-            lyrName = f'Land - {os.path.basename(item.text(0)).split(".")[0]}'
-            layers = QgsProject.instance().mapLayersByName(lyrName)
-            for lyr in layers:
-                QgsProject.instance().removeMapLayer(lyr.id())
+        logger.debug("Pressed Land Load button")
+        file = QFileDialog.getOpenFileName(None, 'Load MOHID Land file', 
+                            filter='Mohid file (*.xy)')[0]
+        # for file in filepaths:
+            # TODO: Verify is layer is already loaded
+            # Add item to item tree
+            # item = QTreeWidgetItem(self.bat_landTree)
+            # item.setText(0, os.path.basename(file))
+            # item.setText(1, file)
+
+        logger.debug(f"Loading {file}")
+        if file != "":
+            # check file type
+
+            shpPath = polygon2shp(file)
+            filename = os.path.basename(shpPath).split(".")[0]
+            vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Land - {filename}", "ogr")
+            
+            if not vlayer:
+                print("Layer failed to load!")
+            else:
+                crs = vlayer.crs()
+                crs.createFromId(CRS_ID_DEFAULT) 
+                vlayer.setCrs(crs)
+        else:
+            logger.debug(f"Filename is empty")
     
     def openGenerateBrowser(self):
         # filepath = QFileDialog.getExistingDirectory(None, "Select output Directory")
@@ -154,20 +165,9 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         if not batPath.endswith(".dat"):
             batPath = f"{batPath}.dat"
 
-        gridPaths = []
-        itemCtn = self.bat_gridTree.topLevelItemCount()
-        for id in range(0, 1):
-            gridPaths.append(self.bat_gridTree.topLevelItem(id).text(1))
-
-        xyzPaths = []
-        itemCtn = self.bat_xyzTree.topLevelItemCount()
-        for id in range(0, itemCtn):
-            xyzPaths.append(self.bat_xyzTree.topLevelItem(id).text(1))
-        
-        landPaths = []
-        itemCtn = self.bat_landTree.topLevelItemCount()
-        for id in range(0, itemCtn):
-            landPaths.append(self.bat_landTree.topLevelItem(id).text(1))
+        gridPath = self.bat_gridPath.text()
+        xyzPath = self.bat_XYZPath.text()
+        landPath = self.bat_landPath.text()
 
         DTCdir = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
                                             '../..',
@@ -175,8 +175,8 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         DTCOptionsPath = os.path.join(DTCdir, "CreateBathymetry.dat")
         # TODO: get options
         # Generate CreateBathymetry.dat options file
-        if gridPaths and xyzPaths:
-            saveGenerateMohidFile(DTCOptionsPath, batPath, gridPaths[0], xyzPaths, landPaths)
+        if gridPath and xyzPath:
+            saveGenerateMohidFile(DTCOptionsPath, batPath, gridPath, xyzPath, landPath)
         else:
             logger.debug("Can't generate bathymetry, missing files")
 
@@ -241,21 +241,12 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         else:
             logger.debug(f"Filename is empty")
     
-    def updatebatComboBoxes(self):
-        
-        self.bat_gridBox.clear()
-        self.bat_XYZBox.clear()
-        self.bat_landBox.clear()
-        # self.bat_bathyBox.clear()
-        for layer in QgsProject.instance().mapLayers().values():
-            if layer.name().startswith("MOHID Grid"):
-                self.bat_gridBox.addItem(layer.name(), layer)
-            elif layer.name().startswith("MOHID Points"):
-                self.bat_XYZBox.addItem(layer.name(), layer)
-            elif layer.name().startswith("MOHID Land"):
-                self.bat_landBox.addItem(layer.name(), layer)
-            # elif layer.name().startswith("MOHID Bathymetry"):
-            #     self.bat_bathyBox.addItem(layer.name(), layer)
+    def updatebatComboBox(self):
+
+        pass
+        # for layer in QgsProject.instance().mapLayers().values():
+        #     if layer.name().startswith("MOHID Bathymetry"):
+        #         self.bat_layerComboBox.addItem(layer.name(), layer)
         # QgsProject.instance().mapLayersByName("Mohid")
     
     def convert(self, input, convertFunction, output=None,):

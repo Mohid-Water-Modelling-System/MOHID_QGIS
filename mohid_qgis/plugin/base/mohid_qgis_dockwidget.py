@@ -30,8 +30,15 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal
 from mohid_qgis.plugin.tab_bathymetry.tab_bathymetry import BathymetryTab
 from mohid_qgis.plugin.tab_grid.tab_grid import GridTab
+from mohid_qgis.plugin.tab_load.tab_Load import LoadTab
 
 from ..utils import WhiteScroll
+# import logging
+# formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+# logger.setLevel(logging.DEBUG)
+# handler = logging.StreamHandler()
+# handler.setFormatter(formatter)
+# logger.addHandler(handler)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'mohid_qgis_dockwidget_base.ui'))
@@ -58,6 +65,7 @@ class MohidPluginDockWidget(QDockWidget):
         tabs = QTabWidget()
         tabs.addTab(WhiteScroll(GridTab(iface, config)), "Grid")
         tabs.addTab(WhiteScroll(BathymetryTab(iface)), "Bathymetry")
+        tabs.addTab(WhiteScroll(LoadTab(iface)), "Load")
         self.setWidget(tabs)
         self.tabs = tabs
 

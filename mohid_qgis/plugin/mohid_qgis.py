@@ -34,12 +34,65 @@ from mohid_qgis.plugin.base.mohid_qgis_dockwidget import MohidPluginDockWidget
 import os.path
 
 import logging
+import logging.config
+# logger = logging.getLogger(__name__)
+# formatter = logging.Formatter('[%(asctime)s]:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+# handler = logging.StreamHandler()
+# fileHandler = logging.FileHandler("mohid_qgis.log", 'a')
+# handler.setFormatter(formatter)
+# fileHandler.setFormatter(formatter)
+# logger.addHandler(handler)
+# logger.addHandler(fileHandler)
+# # fileHandler.level = logging.DEBUG
+# logger.setLevel(logging.DEBUG)
+# logger.debug("I this goinf to file")
+
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'console': {
+            'format': '[%(asctime)s]:[%(module)s]:[%(levelname)s]: - %(message)s'
+        },
+        'file': {
+            'format': '[%(asctime)s]:[%(name)s]:[%(levelname)s] - %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': 'mohid_qgis.log'
+        },
+    },
+    'loggers':{
+        'mohid_qgis.plugin': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'mohid_qgis.core': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    }
+}
+
+logging.config.dictConfig(LOGGING)
+
 logger = logging.getLogger(__name__)
-formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger.info(__name__)
+
 """
 The MohidPlugin is the main class of the plugin.
 It was generated with the PBT tool and the only functions that matter to the programmer are:

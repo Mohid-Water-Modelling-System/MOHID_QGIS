@@ -16,4 +16,4 @@ def XYZ2shp(input_path):
                     writer.record(float(nums[2]))
                     writer.point(float(nums[0]), float(nums[1]))
 
-    return
+    return f"{os.path.splitext(input_path)[0]}.shp" 

@@ -45,7 +45,7 @@ def saveToMohidFile(outputPath, data):
             # logger.debug("Something went wrong saving to mohid file")
             pass
 
-def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPath, landPath = None):
+def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPaths, landPaths):
     
     with open(outPath, "w") as f:
         f.write(f"BATIM_FILE: {batFilepath}\n")
@@ -53,15 +53,17 @@ def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPath, landPath = No
         f.write(f"GRID_FILE: {gridPath}\n")
         f.write("\n")
 
-        if landPath is not None:
+        if landPaths:
             f.write("<BeginLandAreaFiles>\n")
-            f.write(f"{landPath}\n")
+            for landPath in landPaths:
+                f.write(f"{landPath}\n")
             f.write("<EndLandAreaFiles>\n")
         
         f.write("\n\n")
 
         f.write("<BeginXYZPointsFiles>\n")
-        f.write(f"{xyzPath}\n")
+        for xyzPath in xyzPaths:
+            f.write(f"{xyzPath}\n")
         f.write("<EndXYZPointsFiles>\n")
 
         f.write("\n\n")
