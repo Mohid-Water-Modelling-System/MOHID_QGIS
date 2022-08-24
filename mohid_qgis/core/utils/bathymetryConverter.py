@@ -78,7 +78,7 @@ def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPaths, landPaths):
         f.write(f"GRID_LIMITS_PERCENTAGE    : 0.25\n")
 
 def MOHIDBathymetry2shp(input_path, data = None):
-    
+    # TODO: filename with dots are not advised, account for this in the future
     readFile = False
     if data is None:
         readFile = True

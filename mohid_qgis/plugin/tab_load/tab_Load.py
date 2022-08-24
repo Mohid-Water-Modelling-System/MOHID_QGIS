@@ -73,7 +73,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
             if not shpPath:
                 return
             # shpPath = self.bat_gridPath.text().split(".")[0] + ".shp"
-            filename = os.path.basename(shpPath).split(".")[0]
+            filename = os.path.basename(shpPath).strip(".shp")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Grid - {filename}", "ogr")
             
             if not vlayer:
@@ -110,7 +110,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
 
             shpPath = XYZ2shp(file)
             # shpPath = self.bat_XYZPath.text().split(".")[0] + ".shp"
-            filename = os.path.basename(shpPath).split(".")[0]
+            filename = os.path.basename(shpPath).strip(".shp")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Points - {filename}", "ogr")
 
             if not vlayer:
@@ -139,7 +139,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
             # check file type
 
             shpPath = polygon2shp(file)
-            filename = os.path.basename(shpPath).split(".")[0]
+            filename = os.path.basename(shpPath).strip(".shp")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Land - {filename}", "ogr")
             
             if not vlayer:
@@ -194,9 +194,10 @@ class LoadTab(QTabWidget, FORM_CLASS):
         for filepath in filepaths:
             if filepath != "":
                 # check file type
+                # logger.debug(f"Invalid MOHID file")
                 bat = MOHIDBathymetry(filepath)
                 MOHIDBathymetry2shp(filepath, bat.gridData)
-                shpPath = filepath.split(".")[0] + ".shp"
+                shpPath = filepath.strip(".dat") + ".shp"
                 vlayer = self.iface.addVectorLayer(
                                 shpPath,
                                 f"MOHID Bathymetry - {bat.filename}",

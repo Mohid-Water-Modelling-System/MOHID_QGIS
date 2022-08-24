@@ -10,7 +10,7 @@ class MOHIDBathymetry(Grid):
     def __init__(self, filepath):
         
         self._filepath = filepath
-        self.filename = os.path.basename(filepath).split(".")[0]
+        self.filename = os.path.basename(filepath).strip(".dat")
         self.grid = Grid()
         self.gridData = {}
         self.readMohidBathymetry(filepath)

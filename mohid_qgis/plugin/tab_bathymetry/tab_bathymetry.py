@@ -156,7 +156,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
         gridPaths = []
         itemCtn = self.bat_gridTree.topLevelItemCount()
-        for id in range(0, 1):
+        for id in range(0, itemCtn):
             gridPaths.append(self.bat_gridTree.topLevelItem(id).text(1))
 
         xyzPaths = []

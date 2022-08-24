@@ -63,27 +63,27 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'console',
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': 'mohid_qgis.log'
-        },
+        # 'file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.FileHandler',
+        #     'formatter': 'file',
+        #     'filename': 'mohid_qgis.log'
+        # },
     },
     'loggers':{
         'mohid_qgis.plugin': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'mohid_qgis.core': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'DEBUG',
     }
 }
@@ -115,7 +115,7 @@ class MohidPlugin:
 
         # debug
 
-        debug = False
+        debug = True
         waitForAttach = True
 
         if debug:
