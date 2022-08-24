@@ -115,7 +115,7 @@ class MohidPlugin:
 
         # debug
 
-        debug = True
+        debug = False
         waitForAttach = True
 
         if debug:
