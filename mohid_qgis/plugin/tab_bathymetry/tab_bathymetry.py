@@ -156,18 +156,21 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
         gridPaths = []
         itemCtn = self.bat_gridTree.topLevelItemCount()
+        logger.debug(f"Grid count: {itemCtn}")
         for id in range(0, itemCtn):
             gridPaths.append(self.bat_gridTree.topLevelItem(id).text(1))
-
+        logger.debug(f"DTC grids: {gridPaths}")
         xyzPaths = []
         itemCtn = self.bat_xyzTree.topLevelItemCount()
         for id in range(0, itemCtn):
             xyzPaths.append(self.bat_xyzTree.topLevelItem(id).text(1))
         
+        logger.debug(f"DTC xyz: {xyzPaths}")
         landPaths = []
         itemCtn = self.bat_landTree.topLevelItemCount()
         for id in range(0, itemCtn):
             landPaths.append(self.bat_landTree.topLevelItem(id).text(1))
+        logger.debug(f"DTC land: {landPaths}")
 
         DTCdir = os.path.abspath(os.path.join(os.path.dirname( __file__ ),
                                             '../..',
@@ -182,7 +185,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
         if os.path.exists(DTCOptionsPath):
             # Run DTC tool
-            logger.debug("Running DTC")
+            logger.debug("Running DTC...")
             self._runDigitalTerrain()
 
     def loadBatToLayer(self):

@@ -15,7 +15,9 @@ def runExternalProgram(exePath: str, exeArgs: Optional[List[str]]):
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             bufsize=1, universal_newlines=True)
     
+    output = "Digital Terrain Creator output:\n"
     for line in process.stdout:
-        logger.debug(line)
+        output += line
+    logger.info(output)
     
     process.wait()
