@@ -1,6 +1,8 @@
 from ..tab_grid.grid import Grid
 import os
+from pathlib import Path
 
+VALID_TAGS = ["<BeginGridData2D>", "<BeginXX>", "<BeginYY>"]
 class MOHIDBathymetry(Grid):
 
     grid: Grid = None
@@ -10,10 +12,15 @@ class MOHIDBathymetry(Grid):
     def __init__(self, filepath):
         
         self._filepath = filepath
-        self.filename = os.path.basename(filepath).strip(".dat")
+        self.file = Path(filepath)
         self.grid = Grid()
         self.gridData = {}
         self.readMohidBathymetry(filepath)
+
+    def isValid(self):
+        with self.file.open() as f: 
+            cleanFile = list(map(lambda x: x.strip(), f.readlines()))
+        return True if all(tag in cleanFile for tag in VALID_TAGS) else False
 
     def readMohidBathymetry(self, filepath):
 

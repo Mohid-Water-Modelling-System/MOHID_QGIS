@@ -183,36 +183,46 @@ class LoadTab(QTabWidget, FORM_CLASS):
 
     def loadBatToLayer(self):
         
-        logger.debug("Pressed bathymetry Load button")
         filepaths = QFileDialog.getOpenFileNames(None, 'Load MOHID Bathymetry files', 
                             filter='Mohid Bathymetry (*.dat)')[0]
         # self.bat_batPath.setText(filepaths)
         logger.debug(f"Loading {filepaths}")
         for filepath in filepaths:
+            
             if filepath != "":
                 # check file type
                 # logger.debug(f"Invalid MOHID file")
-                bat = MOHIDBathymetry(filepath)
-                MOHIDBathymetry2shp(filepath, bat.gridData)
-                shpPath = filepath.strip(".dat") + ".shp"
-                vlayer = self.iface.addVectorLayer(
-                                shpPath,
-                                f"MOHID Bathymetry - {bat.filename}",
-                                "ogr")
-                if not vlayer:
-                    print("Layer failed to load!")
-                else:
-                    stylePath = os.path.abspath(os.path.join(
-                        os.path.dirname( __file__ ), 'bathymetry.qml'))
-                    vlayer.loadNamedStyle(stylePath)
-                    self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
-                    crs = vlayer.crs()
-                    crs.createFromId(CRS_ID_DEFAULT) 
-                    vlayer.setCrs(crs)
-                    self.loadedBatLayers[vlayer.name()] = bat
+                try:
+                    bat = MOHIDBathymetry(filepath)
+                    if bat.isValid():
+                        MOHIDBathymetry2shp(filepath, bat.gridData)
+                        shpPath = filepath.strip(".dat") + ".shp"
+                        vlayer = self.iface.addVectorLayer(
+                                        shpPath,
+                                        f"MOHID Bathymetry - {bat.file.name}",
+                                        "ogr")
+                        if not vlayer:
+                            logger.error("Layer failed to load!")
+                        else:
+                            stylePath = os.path.abspath(os.path.join(
+                                os.path.dirname( __file__ ), 'bathymetry.qml'))
+                            vlayer.loadNamedStyle(stylePath)
+                            self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
+                            crs = vlayer.crs()
+                            crs.createFromId(CRS_ID_DEFAULT) 
+                            vlayer.setCrs(crs)
+                            self.loadedBatLayers[vlayer.name()] = bat
+                    else:
+                        self.iface.messageBar().pushMessage(
+                            "Invalid file", f"{bat.file.name} has invalid format", 
+                            level=Qgis.Critical)
+                except:
+                    self.iface.messageBar().pushMessage(
+                        "Error", "Unable to convert to shapefile", 
+                        level=Qgis.Critical)
 
             else:
-                logger.debug(f"Filename is empty")
+                logger.error(f"Filename is empty")
     
     def saveBatToMohidFile(self):
         
@@ -256,3 +266,9 @@ class LoadTab(QTabWidget, FORM_CLASS):
 
     def loadLayer(self):
         raise NotImplementedError
+
+# class Bathymetry:
+
+#     def __init__(filepath: str):
+
+#         self.filepath = filepath
