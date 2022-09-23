@@ -31,67 +31,15 @@ from mohid_qgis.plugin.resources.resources import *
 
 # Import the code for the DockWidget
 from mohid_qgis.plugin.base.mohid_qgis_dockwidget import MohidPluginDockWidget
+from mohid_qgis import settings
 import os.path
 
 import logging
 import logging.config
-# logger = logging.getLogger(__name__)
-# formatter = logging.Formatter('[%(asctime)s]:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
-# handler = logging.StreamHandler()
-# fileHandler = logging.FileHandler("mohid_qgis.log", 'a')
-# handler.setFormatter(formatter)
-# fileHandler.setFormatter(formatter)
-# logger.addHandler(handler)
-# logger.addHandler(fileHandler)
-# # fileHandler.level = logging.DEBUG
-# logger.setLevel(logging.DEBUG)
-# logger.debug("I this goinf to file")
 
-LOGGING = {
-    'version': 1,
-    'formatters': {
-        'console': {
-            'format': '[%(asctime)s]:[%(module)s]:[%(levelname)s]: - %(message)s'
-        },
-        'file': {
-            'format': '[%(asctime)s]:[%(name)s]:[%(levelname)s] - %(message)s'
-        }
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
-        },
-        # 'file': {
-        #     'level': 'INFO',
-        #     'class': 'logging.FileHandler',
-        #     'formatter': 'file',
-        #     'filename': 'mohid_qgis.log'
-        # },
-    },
-    'loggers':{
-        'mohid_qgis.plugin': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'mohid_qgis.core': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    }
-}
-
-logging.config.dictConfig(LOGGING)
+logging.config.dictConfig(settings.LOGGING)
 
 logger = logging.getLogger(__name__)
-logger.info(__name__)
 
 """
 The MohidPlugin is the main class of the plugin.

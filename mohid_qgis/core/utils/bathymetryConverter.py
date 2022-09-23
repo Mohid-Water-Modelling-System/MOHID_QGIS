@@ -1,5 +1,7 @@
 import shapefile
 import os
+import logging 
+logger = logging.getLogger(__name__)
 
 def saveToMohidFile(outputPath, data):
 
@@ -101,6 +103,7 @@ def MOHIDBathymetry2shp(input_path, data = None):
         #                 writer.record(float(nums[2]))
         #                 writer.point(float(nums[0]), float(nums[1]))
     else:
+        logger.debug(f"Converting {input_path} to shapefile")
         with shapefile.Writer(os.path.splitext(input_path)[0]) as writer:
             writer.autoBalance = 1
             writer.field("depth", "F", size=20, decimal=8)
@@ -112,7 +115,7 @@ def MOHIDBathymetry2shp(input_path, data = None):
             originX = data['ORIGIN_X']
             originY = data['ORIGIN_Y']
             depthInd = 0
-            print(f"depth data length {len(depthData)}")
+            # print(f"depth data length {len(depthData)}")
             # for i, depth in enumerate(depth):
             for i in range(maxI):
                 for j in range(maxJ):
@@ -137,7 +140,6 @@ def MOHIDBathymetry2shp(input_path, data = None):
                     
                     parts.append(vertices)
                     writer.poly(parts)
-                    print(depthInd)
                     writer.record(depth=depthData[depthInd])
                     depthInd += 1
                     

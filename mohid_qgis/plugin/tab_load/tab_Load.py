@@ -2,7 +2,7 @@ import os
 
 from qgis.PyQt import uic
 from PyQt5.QtWidgets import QTabWidget
-
+from qgis.core import Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
 from qgis.core import QgsProject
@@ -53,7 +53,6 @@ class LoadTab(QTabWidget, FORM_CLASS):
         self.loadedBatLayers = {}     
 
     def loadGridToLayer(self):
-        logger.debug("Pressed Grid Load button")
         file = QFileDialog.getOpenFileName(None, 'Load MOHID Grid file', 
                             filter='Mohid file (*.grd)')[0]
         # for file in filepaths:
@@ -77,13 +76,13 @@ class LoadTab(QTabWidget, FORM_CLASS):
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Grid - {filename}", "ogr")
             
             if not vlayer:
-                logger.warning("Grid layer failed to load")
+                logger.error("Grid layer failed to load")
             else:
                 crs = vlayer.crs()
                 crs.createFromId(CRS_ID_DEFAULT) 
                 vlayer.setCrs(crs)
         else:
-            logger.debug(f"Filename is empty")
+            logger.error(f"Filename is empty")
 
     def loadXYZToLayer(self):
         """
@@ -93,7 +92,6 @@ class LoadTab(QTabWidget, FORM_CLASS):
         -8.7500838888889    38.4880172222222    0.820
         <end_xyz>
         """
-        logger.debug("Pressed XYZ Load button")
         file = QFileDialog.getOpenFileName(None, 'Load MOHID XYZ file', 
                             filter='Mohid file (*.xyz)')[0]
         # for file in filepaths:
@@ -114,7 +112,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Points - {filename}", "ogr")
 
             if not vlayer:
-                print("Layer failed to load!")
+                logger.error("Layer failed to load!")
             else:
                 crs = vlayer.crs()
                 crs.createFromId(CRS_ID_DEFAULT) 
@@ -124,7 +122,6 @@ class LoadTab(QTabWidget, FORM_CLASS):
 
     def loadLandToLayer(self):
 
-        logger.debug("Pressed Land Load button")
         file = QFileDialog.getOpenFileName(None, 'Load MOHID Land file', 
                             filter='Mohid file (*.xy)')[0]
         # for file in filepaths:
@@ -133,8 +130,8 @@ class LoadTab(QTabWidget, FORM_CLASS):
             # item = QTreeWidgetItem(self.bat_landTree)
             # item.setText(0, os.path.basename(file))
             # item.setText(1, file)
-
         logger.debug(f"Loading {file}")
+
         if file != "":
             # check file type
 
@@ -143,13 +140,13 @@ class LoadTab(QTabWidget, FORM_CLASS):
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Land - {filename}", "ogr")
             
             if not vlayer:
-                print("Layer failed to load!")
+                logger.error("Layer failed to load!")
             else:
                 crs = vlayer.crs()
                 crs.createFromId(CRS_ID_DEFAULT) 
                 vlayer.setCrs(crs)
         else:
-            logger.debug(f"Filename is empty")
+            logger.error(f"Filename is empty")
     
     def openGenerateBrowser(self):
         # filepath = QFileDialog.getExistingDirectory(None, "Select output Directory")

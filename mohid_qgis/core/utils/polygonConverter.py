@@ -44,7 +44,7 @@ def polygon2shp(input_path):
                     curr_polygon = []
                     coord_size = 0
                 elif l == "<endpolygon>":
-                    print(curr_polygon)
+                    # print(curr_polygon)
                     if coord_size == 3:
                         writer.polyz([curr_polygon])
                         writer.record('polygonz ' + str(++poly_count))
@@ -57,18 +57,18 @@ def polygon2shp(input_path):
                 else:
                     coord = l.split(" ")
                     coord = list(filter(lambda x: x != '', coord))
-                    print(coord)
+                    # print(coord)
                     if not curr_polygon:
                         coord_size = len(coord)
 
                     elif len(coord) != coord_size:
-                        print('invalid coordinates')
+                        # print('invalid coordinates')
                         input_f.close()
                         writer.close()
                         return
                     curr_polygon.append(list(map(float,coord)))
 
-            print('done')
+            # print('done')
     
     return f"{os.path.splitext(input_path)[0]}.shp" 
 
