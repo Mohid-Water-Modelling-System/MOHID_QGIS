@@ -21,7 +21,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': str(Path.home()/"mohid_qgis.log")
+            'filename': str(Path(__file__).parent.absolute()/"mohid_qgis.log")
         },
     },
     'loggers':{
