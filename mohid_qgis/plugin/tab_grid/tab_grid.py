@@ -51,7 +51,7 @@ class GridTab(QTabWidget, FORM_CLASS):
         rowAdder = GridRowAdder(self.spinBoxRowsQuantity, rowVariableSpacingField, self.toolButtonAddRows)
         variableLayoutField = GridVariableLayoutField(gridLayoutTable, self.labelSpacingRange, colAdder, rowAdder)
         layoutField = GridLayoutField(self.radioButtonRegular, regularLayoutField, self.radioButtonVariableSpaced, variableLayoutField)
-        layerNameField = GridLayerNameField(self.lineEditLayerName, self.toolButtonLayerName)
+        layerNameField = GridLayerNameField(self.lineEditLayerName)
         form = GridForm(crsField, originField, angleField, layoutField, layerNameField)
 
         self.gridTool = GridTool(form, self.pushButtonPreview, self.pushButtonLoad, self.pushButtonSave, config)

@@ -19,12 +19,10 @@ class GridLayerNameField(QObject):
     """
     The GridLayerNameField constructor receives:
         - a QLineEdit field for the user to enter a string with the name of the layer
-        - a button for the user to select an already existing layer (not yet implemented)
     """
-    def __init__(self, l: QLineEdit, b: QToolButton):
+    def __init__(self, l: QLineEdit):
         super().__init__()
         self.setLineEdit(l)
-        self.setButton(b)
 
     """
     The LineEdit setter receives a QLineEdit object,
@@ -40,12 +38,6 @@ class GridLayerNameField(QObject):
 
     def getLineEdit(self) -> QLineEdit:
         return self.__lineEdit
-
-    def setButton(self, b: QToolButton):
-        self.__button = b
-
-    def getButton(self) -> QToolButton:
-        return self.__button
 
     """
     The lineEditTextChanged function is called when the content of the LineEdit is changed.
