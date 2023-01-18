@@ -4,21 +4,32 @@ This repository holds the [QGIS](https://qgis.org/) plugin of the [MOHID](http:/
 ## Notes
 
 python version: 3.9
-qgis version: 3.16+
+qgis version: 3.22
 tested in windows 10 and ubuntu 20.04
 
-## Compile and Deploy
+## Development setup
 
-Use [pb_tool](https://github.com/g-sherman/plugin_build_tool) to compile and deploy the MOHID plugin, specifying the directory where to deploy the plugin:
+### Clone repository
 
-```bash
-pbt deploy -p PATH
-```
+    git clone https://github.com/Mohid-Water-Modelling-System/mohid_qgis.git
 
->  **_NOTE:_**  To find the plugin path open [QGIS](https://qgis.org/):
-> 1. Select `Settings` on the Menu Toolbar
-> 2. Select `User profiles` -> `Open active profile folder`
-> 3. Open the `python/plugins` subdirectory - that is the plugin path for QGIS.
+### Create a symbolic link for the plugin 
+
+Different versions of QGIS might consider different locations for its plugins. To avoid working from the QGIS plugin folder, it is recommended to set the repository elsewhere and create a symbolic link to the the plugin folder, for e.g.:
+
+In windows (cmd.exe):
+
+    mklink /D C:\Users\<USER>\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\mohid_qgis \C:\Users\<USER>\GitHub\mohid_qgis\mohid_qgis
+   
+
+**NOTE:**  To find the QGIS _plugin path_, open QGIS and do as follows:
+1. Select `Settings` on the Menu Toolbar
+2. Select `User profiles` -> `Open active profile folder`
+3. Open the `python/plugins` subdirectory - that is the plugin path for QGIS.
+
+### Debugger setup
+
+TODO
 
 ## Activate the MOHID plugin
 

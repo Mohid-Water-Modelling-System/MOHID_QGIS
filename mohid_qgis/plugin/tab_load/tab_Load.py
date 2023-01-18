@@ -1,14 +1,13 @@
 import os
+from pathlib import Path
 
 from qgis.PyQt import uic
 from PyQt5.QtWidgets import QTabWidget
 from qgis.core import Qgis
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
-from qgis.core import QgsProject
-from .mohidBathymetry import MOHIDBathymetry
+from qgis.PyQt.QtWidgets import QFileDialog
+from ..mohid.batymetry import MOHIDBathymetry
 
-from mohid_qgis.core.utils.gridConverter import grid2shp
+from mohid_qgis.core.utils.gridConverter import curvillinear2shp, grid2shp
 from mohid_qgis.core.utils.polygonConverter import polygon2shp
 from mohid_qgis.core.utils.xyzConverter import XYZ2shp
 from mohid_qgis.core.utils.bathymetryConverter import MOHIDBathymetry2shp, saveToMohidFile, \
@@ -55,6 +54,16 @@ class LoadTab(QTabWidget, FORM_CLASS):
     def loadGridToLayer(self):
         file = QFileDialog.getOpenFileName(None, 'Load MOHID Grid file', 
                             filter='Mohid file (*.grd)')[0]
+        
+        def getGridType(gridFile):
+            with Path(gridFile).open() as f: 
+                cleanFile = list(map(lambda x: x.strip(), f.readlines()))
+            if "<CornersXY>" in cleanFile:
+                return "curvillinear"
+            elif "<BeginXX>" in cleanFile:
+                return "regular"
+            else:
+                raise RuntimeError("Invalid MOHID format!")
         # for file in filepaths:
             # TODO: Verify is layer is already loaded
             # Add item to item tree
@@ -68,11 +77,15 @@ class LoadTab(QTabWidget, FORM_CLASS):
             # check file type
 
             # Convert grid to shapefile
-            shpPath = grid2shp(file)
+            gridType = getGridType(file)
+            if gridType == "regular":
+                shpPath = grid2shp(file)
+            elif gridType == "curvillinear":
+                shpPath=curvillinear2shp(file)
             if not shpPath:
                 return
             # shpPath = self.bat_gridPath.text().split(".")[0] + ".shp"
-            filename = os.path.basename(shpPath).strip(".shp")
+            filename = os.path.basename(shpPath).replace(".shp", "")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Grid - {filename}", "ogr")
             
             if not vlayer:
@@ -108,7 +121,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
 
             shpPath = XYZ2shp(file)
             # shpPath = self.bat_XYZPath.text().split(".")[0] + ".shp"
-            filename = os.path.basename(shpPath).strip(".shp")
+            filename = os.path.basename(shpPath).replace(".shp", "")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Points - {filename}", "ogr")
 
             if not vlayer:
@@ -136,7 +149,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
             # check file type
 
             shpPath = polygon2shp(file)
-            filename = os.path.basename(shpPath).strip(".shp")
+            filename = os.path.basename(shpPath).replace(".shp", "")
             vlayer = self.iface.addVectorLayer(shpPath, f"MOHID Land - {filename}", "ogr")
             
             if not vlayer:
@@ -195,8 +208,8 @@ class LoadTab(QTabWidget, FORM_CLASS):
                 try:
                     bat = MOHIDBathymetry(filepath)
                     if bat.isValid():
-                        MOHIDBathymetry2shp(filepath, bat.gridData)
-                        shpPath = filepath.strip(".dat") + ".shp"
+                        MOHIDBathymetry2shp(filepath, bat)
+                        shpPath = filepath.replace(".dat", "") + ".shp"
                         vlayer = self.iface.addVectorLayer(
                                         shpPath,
                                         f"MOHID Bathymetry - {bat.file.name}",
@@ -216,7 +229,8 @@ class LoadTab(QTabWidget, FORM_CLASS):
                         self.iface.messageBar().pushMessage(
                             "Invalid file", f"{bat.file.name} has invalid format", 
                             level=Qgis.Critical)
-                except:
+                except Exception as e:
+                    logger.exception(f"Loading bathymetry error: {e}")
                     self.iface.messageBar().pushMessage(
                         "Error", "Unable to convert to shapefile", 
                         level=Qgis.Critical)
@@ -241,7 +255,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
            
             data2D = []
             for feat in lyr.getFeatures():
-                data2D.append(feat.attributes()[0])
+                data2D.append(feat.attributes()[feat.fieldNameIndex("depth")])
             bat.gridData['DATA_2D'] = data2D
             saveToMohidFile(filepath, bat.gridData)
 

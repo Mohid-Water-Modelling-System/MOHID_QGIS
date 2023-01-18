@@ -79,10 +79,10 @@ def saveGenerateMohidFile(outPath, batFilepath, gridPath, xyzPaths, landPaths):
         f.write(f"EXPAND_GRID_LIMITS        : 1\n")
         f.write(f"GRID_LIMITS_PERCENTAGE    : 0.25\n")
 
-def MOHIDBathymetry2shp(input_path, data = None):
+def MOHIDBathymetry2shp(input_path, bathymetry):
     # TODO: filename with dots are not advised, account for this in the future
     readFile = False
-    if data is None:
+    if bathymetry is None:
         readFile = True
     
     if readFile:
@@ -106,42 +106,65 @@ def MOHIDBathymetry2shp(input_path, data = None):
         logger.debug(f"Converting {input_path} to shapefile")
         with shapefile.Writer(os.path.splitext(input_path)[0]) as writer:
             writer.autoBalance = 1
-            writer.field("depth", "F", size=20, decimal=8)
-            maxI = data['IUB']
-            maxJ = data['JUB']
-            DX = data['POINTS_XX']
-            DY = data['POINTS_YY']
-            depthData = data['DATA_2D']
-            originX = data['ORIGIN_X']
-            originY = data['ORIGIN_Y']
+            id=0
             depthInd = 0
-            # print(f"depth data length {len(depthData)}")
-            # for i, depth in enumerate(depth):
-            for i in range(maxI):
-                for j in range(maxJ):
-                    # writer.record(float(nums[2]))
-                    # writer.point(float(nums[0]), float(nums[1]))
-                    vertices = []
-                    parts = []
-                    
-                    # Cell vertices
-                    # Special attention to first cell of each row
-
-                    vertices.append([originX + DX[j], originY + DY[i]])     # Bottom left corner
-                    vertices.append([originX + DX[j + 1], originY + DY[i]]) # Bottom rigth corner
-                    vertices.append([originX + DX[j + 1], originY + DY[i + 1]]) # # Top rigth corner
-                    vertices.append([originX + DX[j], originY + DY[i + 1]]) # Top left corner
-
-
-                    # vertices.append([originX + DX[j], originY + DY[maxI - i - 1]]) #4
-                    # vertices.append([originX + DX[j + 1], originY + DY[maxI - i - 1]]) #3
-                    # vertices.append([originX + DX[j + 1], origin_y + (i_max - i) * dy]) #2
-                    # vertices.append([originX + DX[j], origin_y + (i_max - i) * dy]) #1
-                    
-                    parts.append(vertices)
-                    writer.poly(parts)
-                    writer.record(depth=depthData[depthInd])
-                    depthInd += 1
-                    
-                    
+            writer.field("ID", "N")
+            writer.field("depth", "F", size="20", decimal=8)
+            maxI = bathymetry.gridData['IUB']
+            maxJ = bathymetry.gridData['JUB']
+            originX = bathymetry.gridData['ORIGIN_X']
+            originY = bathymetry.gridData['ORIGIN_Y']
+            if bathymetry.type == "regular":
+                DX = bathymetry.gridData['POINTS_XX']
+                DY = bathymetry.gridData['POINTS_YY']
+                depthData = bathymetry.gridData['DATA_2D']
+                for i in range(maxI):
+                    for j in range(maxJ):
+                        vertices = []
+                        parts = []
+                        # Cell vertices
+                        # Special attention to first cell of each row
+                        vertices.append([originX + DX[j], originY + DY[i]])     # Bottom left corner
+                        vertices.append([originX + DX[j + 1], originY + DY[i]]) # Bottom rigth corner
+                        vertices.append([originX + DX[j + 1], originY + DY[i + 1]]) # # Top rigth corner
+                        vertices.append([originX + DX[j], originY + DY[i + 1]]) # Top left corner
+                        parts.append(vertices)
+                        writer.poly(parts)
+                        writer.record(ID=id, depth=depthData[depthInd])
+                        depthInd += 1
+                        id += 1
+            elif bathymetry.type == "curvillinear":
+                EMPTY_VALUE = float("-9.9e15")
+                numOfRows = maxI + 1
+                numOfColumns = maxJ + 1
+                corners = bathymetry.gridData["CORNERS"]
+                for row in range(0, numOfRows-1):
+                    lastLine = corners[row*numOfColumns:row*numOfColumns+numOfColumns]
+                    curLine = corners[(row+1)*numOfColumns:(row+1)*numOfColumns+numOfColumns]
+                    logger.debug(f"Last line has indexes {row*numOfColumns}:{row*numOfColumns+numOfColumns}")
+                    logger.debug(f"Current line has indexes {(row+1)*numOfColumns}:{(row+1)*numOfColumns+numOfColumns}")
+                    depthData = bathymetry.gridData['DATA_2D']
+                    for i in range(0, len(curLine)-1):
+                        # Any group of 4 corners that has empty values is ignored
+                        
+                        if EMPTY_VALUE in [
+                                    lastLine[i][0], lastLine[i][1]
+                                ,   lastLine[i+1][0], lastLine[i+1][1]
+                                ,   curLine[i+1][0], curLine[i+1][1]
+                                ,   curLine[i][0], curLine[i][1]]:
+                            # writer.record(ID=id, depth=depthData[depthInd])
+                            # id += 1
+                            depthInd += 1
+                            continue
+                        vertices = []
+                        parts = []
+                        vertices.append([originX + lastLine[i][0], originY + lastLine[i][1]])     # Bottom left corner
+                        vertices.append([originX + lastLine[i+1][0], originY + lastLine[i+1][1]])   # Bottom rigth corner
+                        vertices.append([originX + curLine[i+1][0], originY + curLine[i+1][1]])   # Top rigth corner
+                        vertices.append([originX + curLine[i][0], originY + curLine[i][1]])       # Top left corner
+                        parts.append(vertices)
+                        writer.poly(parts)
+                        writer.record(ID=id, depth=depthData[depthInd])
+                        id += 1
+                        depthInd += 1
     return

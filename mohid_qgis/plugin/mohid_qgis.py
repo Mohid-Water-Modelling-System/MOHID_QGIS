@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2021-08-02
         git sha              : $Format:%H$
-        copyright            : (C) 2021 by MARETEC
+        copyright            : CoLAB+Atlantic (C) 2023
         email                : vasco.guita@tecnico.ulisboa.pt
  ***************************************************************************/
 
@@ -74,7 +74,6 @@ class MohidPlugin:
                 # debugpy.breakpoint()
 
         # Save reference to the QGIS interface
-        # time.sleep(10)
         logger.debug("MohidPlugin init")
         self.iface = iface
 
@@ -203,7 +202,7 @@ class MohidPlugin:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         logger.debug("MohidPlugin initGui")
-        icon_path = ':/plugins/mohid_qgis/icon.png'
+        icon_path = ':/plugins/mohid_qgis/mohid_logo.png'
         self.add_action(
             icon_path,
             text=self.tr(u'MOHID plugin'),
@@ -222,18 +221,6 @@ class MohidPlugin:
         # disconnects
         self.dockWidget.closingPlugin.disconnect(self.onClosePlugin)
 
-        # remove this statement if dockwidget is to remain
-        # for reuse if plugin is reopened
-        # Commented next statement since it causes QGIS crashe
-        # when closing the docked window:
-        # self.dockwidget = None
-
-        # gridTool = self.getGridTool()
-        # gridTool.close()
-        # TODO: write unload functions for each tab
-        # this way future tabs dont need to touch this file
-        # for tab in tabs:
-            #tab.unload()
 
         self.pluginIsActive = False
 
@@ -257,10 +244,6 @@ class MohidPlugin:
         if not self.dockWidget:
             self.dockWidget = MohidPluginDockWidget(self.iface, 
                                             self.dockWidget, self.getConfig())
-        # if self.first_start == True:
-        #     self.first_start = False
-        #     # Create the dockwidget (after translation) and keep reference
-        #     self.dockwidget = MohidPluginDockWidget()
 
         if not self.pluginIsActive:
             self.pluginIsActive = True

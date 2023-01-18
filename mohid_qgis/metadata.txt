@@ -6,14 +6,14 @@
 name=MOHID
 qgisMinimumVersion=3.0
 description=QGIS plugin for the MOHID model
-version=0.1
-author=MARETEC
-email=vasco.guita@tecnico.ulisboa.pt
+version=0.5.0
+author=CoLAB+Atlantic
+email=rui.correia@colabatlantic.com
 
 about=QGIS plugin for the MOHID model.
 
-tracker=https://github.com/vascoguita/mohid_qgis
-repository=https://github.com/vascoguita/mohid_qgis
+tracker=https://github.com/Mohid-Water-Modelling-System/mohid_qgis
+repository=https://github.com/Mohid-Water-Modelling-System/mohid_qgis
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,9 +25,9 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=https://github.com/vascoguita/mohid_qgis
+homepage=https://github.com/Mohid-Water-Modelling-System/mohid_qgis
 category=Plugins
-icon=icon.png
+icon=mohid_logo.png
 # experimental flag
 experimental=False
 

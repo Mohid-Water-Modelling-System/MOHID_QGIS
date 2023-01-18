@@ -120,6 +120,20 @@ class Grid:
 
         output = origin.toString(config) + angle.toString(config) \
             + crs.toString(config) + layout.toString(config)
+        
+        points = layout.toPoints(origin, angle)
+        POINTS_XX = [points[row][col].x() for row in range(0, len(points)) for col in range(0, len(points[0]))]
+        POINTS_YY = [points[row][col].y() for row in range(0, len(points)) for col in range(0, len(points[0]))]
+        output += "\n\n"
+        output += "<BeginXX>\n"
+        for p in POINTS_XX:
+            output += f"{p:.15f}\n"
+        output += "<EndXX>\n"
+
+        output += "<BeginYY>\n"
+        for p in POINTS_YY:
+            output += f"{p:.15f}\n"
+        output += "<EndYY>\n"
 
         return output
     

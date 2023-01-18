@@ -26,7 +26,6 @@ from typing import Any, Dict
 
 
 def loadFromFile(filename)-> Dict[str, Any]:
-    # type: (file)
     """ 
     Notes
     -----

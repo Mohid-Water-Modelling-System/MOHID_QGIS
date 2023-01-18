@@ -18,7 +18,7 @@ LOGGING = {
             'formatter': 'console',
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'file',
             'filename': str(Path(__file__).parent.absolute()/"mohid_qgis.log")
@@ -26,18 +26,18 @@ LOGGING = {
     },
     'loggers':{
         'mohid_qgis.plugin': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'mohid_qgis.core': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['file'],
         'level': 'DEBUG',
     }
 }

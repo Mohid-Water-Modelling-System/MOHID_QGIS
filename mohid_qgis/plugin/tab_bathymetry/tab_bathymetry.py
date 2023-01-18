@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QPushButton, QFileDialog
 from qgis.core import QgsProject
-from .mohidBathymetry import MOHIDBathymetry
+from ..mohid.batymetry import MOHIDBathymetry
 
 from mohid_qgis.core.utils.gridConverter import grid2shp
 from mohid_qgis.core.utils.polygonConverter import polygon2shp
@@ -33,22 +33,18 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
 
         self.iface = iface
         # Connect signals
-        # self.bat_fsGrid.clicked.connect(self.openGridBrowser)
         self.bat_loadGrdBtn.clicked.connect(self.addGridToLayer)
         self.bat_removeGrdBtn.clicked.connect(self.removeGridLayer)
 
-        # self.bat_fsXYZ.clicked.connect(self.openXYZBrowser)
         self.bat_loadXYZBtn.clicked.connect(self.addXYZToLayer)
         self.bat_removeXYZBtn.clicked.connect(self.removeXYZLayer)
 
-        # self.bat_fsLand.clicked.connect(self.openLandBrowser)
         self.bat_loadLandBtn.clicked.connect(self.addLandToLayer)
         self.bat_removeLandBtn.clicked.connect(self.removeLandLayer)
 
         self.bat_fsOutput.clicked.connect(self.openGenerateBrowser)
         self.bat_generateBtn.clicked.connect(self.generateBatMohidFile)
 
-        # self.bat_fsBat.clicked.connect(self.openBatBrowser)
         self.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
         self.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
         QgsProject.instance().layersAdded.connect(self.updatebatComboBoxes)
@@ -75,11 +71,6 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         for item in selItems:
             # Remove item from item tree
             root.removeChild(item)
-            # Remove layer
-            # lyrName = f'Grid - {os.path.basename(item.text(0)).split(".")[0]}'
-            # layers = QgsProject.instance().mapLayersByName(lyrName)
-            # for lyr in layers:
-            #     QgsProject.instance().removeMapLayer(lyr.id())
 
     def addXYZToLayer(self):
         """
@@ -108,11 +99,6 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         for item in selItems:
             # Remove item from item tree
             root.removeChild(item)
-            # Remove layer
-            # lyrName = f'Bathymetry points - {os.path.basename(item.text(0)).split(".")[0]}'
-            # layers = QgsProject.instance().mapLayersByName(lyrName)
-            # for lyr in layers:
-            #     QgsProject.instance().removeMapLayer(lyr.id())
 
     def addLandToLayer(self):
 
@@ -135,11 +121,6 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         for item in selItems:
             # Remove item from item tree
             root.removeChild(item)
-            # Remove layer
-            lyrName = f'Land - {os.path.basename(item.text(0)).split(".")[0]}'
-            layers = QgsProject.instance().mapLayersByName(lyrName)
-            for lyr in layers:
-                QgsProject.instance().removeMapLayer(lyr.id())
     
     def openGenerateBrowser(self):
         # filepath = QFileDialog.getExistingDirectory(None, "Select output Directory")
@@ -199,7 +180,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
             if filepath != "":
                 # check file type
                 bat = MOHIDBathymetry(filepath)
-                MOHIDBathymetry2shp(filepath, bat.gridData)
+                MOHIDBathymetry2shp(filepath, bat)
                 shpPath = filepath.split(".")[0] + ".shp"
                 vlayer = self.iface.addVectorLayer(
                                 shpPath,
@@ -237,7 +218,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
            
             data2D = []
             for feat in lyr.getFeatures():
-                data2D.append(feat.attributes()[0])
+                data2D.append(feat.attributes()[feat.fieldNameIndex("depth")])
             bat.gridData['DATA_2D'] = data2D
             saveToMohidFile(filepath, bat.gridData)
 

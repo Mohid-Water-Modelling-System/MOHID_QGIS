@@ -322,6 +322,139 @@ def grid2shp(input_path, output_path = None):
         logger.exception("Unable to convert grid file to shapefile")
         return None
 
+def curvillinear2shp(input_path, output_path = None):
+
+    if not output_path:
+        output_path = input_path
+    logger.info(f"Converting {input_path} to shapefile")
+    try:
+        with open(input_path, "r") as input_f:
+            with shapefile.Writer(os.path.splitext(output_path)[0]) as writer:
+                writer.field("ID", "N")
+                origin_x = 0.0
+                origin_y = 0.0
+                latitude = 0.0
+                longitude = 0.0
+                constant_x = False
+                constant_y = False
+                dx = 0.0
+                dy = 0.0
+                i_min = 0
+                i_max = 0
+                j_min = 0
+                j_max = 0
+                angle = 0.0
+                corners = []
+                EMPTY_VALUE = float("-9.9e15")
+                # for l in input_f:
+                #     l = l.rstrip()
+                #     l = l.split(" ")
+                #     l = list(filter(lambda x: x not in ('',':','\t','\n'), l))
+                #     info += [l]
+                
+                # info = [x for x in info if x != []]
+                logger.debug("MOHID Grid parameters:")
+                for line in input_f:
+                    line = line.strip('\n').split(" ")
+                    i = list(filter(lambda x: x not in ('',':','\t','\n'), line))
+                    
+                    if not i:
+                        continue
+                    elif 'COMENT' in i[0]:
+                        continue
+                    elif i[0] == 'LATITUDE':
+                        latitude = float(i[1])
+                        logger.debug(f"LATITUDE: {latitude}")
+                    elif i[0] == 'LONGITUDE':
+                        longitude = float(i[1])
+                        logger.debug(f"LONGITUDE: {longitude}")
+                    elif i[0] == 'ORIGIN':
+                        origin_x = float(i[1])
+                        origin_y = float(i[2])
+                        logger.debug(f"Origin: {origin_x}, {origin_y}")
+                    elif i[0] == 'DX':
+                        dx = float(i[1])
+                        logger.debug(f"DX: {dx}")
+                    elif i[0] == 'DY':
+                        dy = float(i[1])
+                        logger.debug(f"DY {dy}")
+                    elif i[0] == 'GRID_ANGLE':
+                        angle = float(i[1])
+                        logger.debug(f"Angle: {angle}")
+                    elif i[0] == 'ILB_IUB':
+                        i_min = int(i[1])
+                        i_max = int(i[2])
+                        logger.debug(f"ILB_IUB: {i_min}, {i_max}")
+                    elif i[0] == 'JLB_JUB':
+                        j_min = int(i[1])
+                        j_max = int(i[2])
+                        logger.debug(f"JLB_JUB {j_min}, {j_max}")
+                    elif i[0] == 'CONSTANT_SPACING_X':
+                        if int(i[1]) == 1:
+                            constant_x = True
+                        else:
+                            constant_x = False
+                    elif i[0] == 'CONSTANT_SPACING_Y':
+                        if int(i[1]) == 1:
+                            constant_y = True
+                        else:
+                            constant_y = False
+                    elif i[0] == "<CornersXY>":
+                        # Read corners
+                        isPoint = True
+                        while isPoint:
+                            line = next(input_f).strip('\n').split(" ")
+                            i = list(filter(
+                                lambda x: x not in ('',':','\t','\n'), line))
+                            if i[0] == "<\CornersXY>":
+                                isPoint = False
+                            else:
+                                corners.append([float(i[0]), float(i[1])])
+                    else:
+                        continue
+                writer.autoBalance = 1
+                id=0
+                if corners:
+                    # Curvillinear grid
+                    logger.info("Converting curvillinear Grid")
+                    numOfRows = i_max + 1
+                    numOfColumns = j_max + 1
+                    for row in range(0, numOfRows-1):
+                        lastLine = corners[row*numOfColumns:row*numOfColumns+numOfColumns]
+                        curLine = corners[(row+1)*numOfColumns:(row+1)*numOfColumns+numOfColumns]
+                        logger.debug(f"Last line has indexes {row*numOfColumns}:{row*numOfColumns+numOfColumns}")
+                        logger.debug(f"Current line has indexes {(row+1)*numOfColumns}:{(row+1)*numOfColumns+numOfColumns}")
+
+                        for i in range(0, len(curLine)-1):
+                            # Any group of 4 corners that has empty values is ignored
+                            if EMPTY_VALUE in [
+                                lastLine[i][0], lastLine[i][1],
+                                lastLine[i+1][0], lastLine[i+1][1],
+                                curLine[i+1][0], curLine[i+1][1],
+                                curLine[i][0], curLine[i][1]
+                            ]:
+                                continue
+                            id += 1
+                            vertices = []
+                            parts = []
+                            vertices.append([origin_x + lastLine[i][0], origin_y + lastLine[i][1]])     # Bottom left corner
+                            vertices.append([origin_x + lastLine[i+1][0], origin_y + lastLine[i+1][1]])   # Bottom rigth corner
+                            vertices.append([origin_x + curLine[i+1][0], origin_y + curLine[i+1][1]])   # Top rigth corner
+                            vertices.append([origin_x + curLine[i][0], origin_y + curLine[i][1]])       # Top left corner
+                    
+                            parts.append(vertices)
+                            writer.poly(parts)
+                            writer.record(id)
+                        
+                else:
+                    logger.warning("Invalid grid file")
+                    return None
+        logger.info(f"Successfully converted grid to shapefile {os.path.splitext(output_path)[0]}.shp")
+        return f"{os.path.splitext(output_path)[0]}.shp"
+    except Exception:
+        logger.exception("Unable to convert grid file to shapefile")
+        return None
+
 def main(argv):
     inputfile = ''
     _format = ''
