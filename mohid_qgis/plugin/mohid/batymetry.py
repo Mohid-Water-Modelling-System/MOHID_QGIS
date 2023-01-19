@@ -163,6 +163,8 @@ class MOHIDBathymetry(Grid):
                     elif elems[0] == 'JLB_JUB':
                         self.gridData['JLB'] = int(elems[1])
                         self.gridData['JUB'] = int(elems[2])
+                    elif elems[0] == "COORD_TIP":
+                        self.gridData['COORD_TIP'] = elems[1]
                     elif elems[0] == "<CornersXY>":
                         # Read corners
                         isPoint = True

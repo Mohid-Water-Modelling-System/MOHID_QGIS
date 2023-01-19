@@ -3,8 +3,9 @@ import os
 import logging 
 logger = logging.getLogger(__name__)
 
-def saveToMohidFile(outputPath, data):
+def saveToMohidFile(outputPath, bat):
 
+    data = bat.gridData
     if not outputPath.endswith(".dat"):
         outputPath = outputPath + ".dat"
 
@@ -29,15 +30,21 @@ def saveToMohidFile(outputPath, data):
             
             f.write("\n\n")
             
-            f.write("<BeginXX>\n")
-            for p in data['POINTS_XX']:
-                f.write(f"{p:.15f}\n")
-            f.write("<EndXX>\n")
+            if bat.type == "regular":
+                f.write("<BeginXX>\n")
+                for p in data['POINTS_XX']:
+                    f.write(f"{p:.15f}\n")
+                f.write("<EndXX>\n")
 
-            f.write("<BeginYY>\n")
-            for p in data['POINTS_YY']:
-                f.write(f"{p:.15f}\n")
-            f.write("<EndYY>\n")
+                f.write("<BeginYY>\n")
+                for p in data['POINTS_YY']:
+                    f.write(f"{p:.15f}\n")
+                f.write("<EndYY>\n")
+            elif bat.type == "curvillinear":
+                f.write("<CornersXY>\n")
+                for p in data['CORNERS']:
+                    f.write(f"{p[0]} {p[1]}\n")
+                f.write("<\\CornersXY>\n")
 
             f.write("<BeginGridData2D>\n")
             for p in data['DATA_2D']:
@@ -152,8 +159,8 @@ def MOHIDBathymetry2shp(input_path, bathymetry):
                                 ,   lastLine[i+1][0], lastLine[i+1][1]
                                 ,   curLine[i+1][0], curLine[i+1][1]
                                 ,   curLine[i][0], curLine[i][1]]:
-                            # writer.record(ID=id, depth=depthData[depthInd])
-                            # id += 1
+                            writer.record(ID=id, depth=depthData[depthInd])
+                            id += 1
                             depthInd += 1
                             continue
                         vertices = []

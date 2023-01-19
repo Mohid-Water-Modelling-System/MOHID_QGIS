@@ -223,7 +223,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
             for feat in lyr.getFeatures():
                 data2D.append(feat.attributes()[feat.fieldNameIndex("depth")])
             bat.gridData['DATA_2D'] = data2D
-            saveToMohidFile(filepath, bat.gridData)
+            saveToMohidFile(filepath, bat)
 
         else:
             logger.debug(f"Filename is empty")
