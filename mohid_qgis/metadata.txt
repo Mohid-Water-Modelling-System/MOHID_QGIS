@@ -7,7 +7,7 @@ name=MOHID
 qgisMinimumVersion=3.0
 description=QGIS plugin for the MOHID model
 version=0.5.0
-author=CoLAB+Atlantic
+author=+ATLANTIC CoLAB
 email=rui.correia@colabatlantic.com
 
 about=QGIS plugin for the MOHID model.
