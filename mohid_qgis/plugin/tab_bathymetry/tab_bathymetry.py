@@ -55,9 +55,10 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         logger.debug("Pressed Grid Add button")
         
         vlayer = self.bat_gridBox.currentData()
-        item = QTreeWidgetItem(self.bat_gridTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Grid - ", ""))
-        item.setText(1, vlayer.source().replace(".shp", ".grd"))
+        if vlayer is not None:
+            item = QTreeWidgetItem(self.bat_gridTree)
+            item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Grid - ", ""))
+            item.setText(1, vlayer.source().replace(".shp", ".grd"))
     
     def removeGridLayer(self):
 
@@ -83,9 +84,10 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         logger.debug("Pressed XYZ Add button")
         
         vlayer = self.bat_XYZBox.currentData()
-        item = QTreeWidgetItem(self.bat_xyzTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Points - ", ""))
-        item.setText(1, vlayer.source().replace(".shp", ".xyz"))
+        if vlayer is not None:
+            item = QTreeWidgetItem(self.bat_xyzTree)
+            item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Points - ", ""))
+            item.setText(1, vlayer.source().replace(".shp", ".xyz"))
     
     def removeXYZLayer(self):
 
@@ -105,9 +107,10 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         logger.debug("Pressed Land Add button")
         
         vlayer = self.bat_landBox.currentData()
-        item = QTreeWidgetItem(self.bat_landTree)
-        item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Land - ", ""))
-        item.setText(1, vlayer.source().replace(".shp", ".xy"))
+        if vlayer is not None:
+            item = QTreeWidgetItem(self.bat_landTree)
+            item.setText(0, os.path.basename(vlayer.name()).replace("MOHID Land - ", ""))
+            item.setText(1, vlayer.source().replace(".shp", ".xy"))
     
     def removeLandLayer(self):
 
