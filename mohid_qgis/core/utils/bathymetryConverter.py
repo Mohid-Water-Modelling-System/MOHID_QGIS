@@ -94,26 +94,11 @@ def MOHIDBathymetry2shp(input_path, bathymetry):
     
     if readFile:
         pass
-        # with open(input_path, "r") as input_f:
-        #     with shapefile.Writer(os.path.splitext(input_path)[0]) as writer:
-        #         writer.autoBalance = 1
-        #         writer.field("depth", "F", size=20, decimal=8)
-
-        #         for line in input_f.readlines():
-        #             line = line.strip("\n")
-        #             if line == "<begin_xyz>":
-        #                 pass
-        #             elif line == "<end_xyz>":
-        #                 pass
-        #             else:
-        #                 nums = list(filter(lambda x: x != '', line.split(" ")))
-        #                 writer.record(float(nums[2]))
-        #                 writer.point(float(nums[0]), float(nums[1]))
     else:
         logger.debug(f"Converting {input_path} to shapefile")
         with shapefile.Writer(os.path.splitext(input_path)[0]) as writer:
             writer.autoBalance = 1
-            id=0
+            id=1
             depthInd = 0
             writer.field("ID", "N")
             writer.field("depth", "F", size="20", decimal=8)
@@ -142,18 +127,19 @@ def MOHIDBathymetry2shp(input_path, bathymetry):
                         id += 1
             elif bathymetry.type == "curvillinear":
                 EMPTY_VALUE = float("-9.9e15")
-                numOfRows = maxI + 1
-                numOfColumns = maxJ + 1
+                # Num of corners > Num of cells 
+                rowsOfCorners = maxI + 1
+                colsOfCorners = maxJ + 1
                 corners = bathymetry.gridData["CORNERS"]
-                for row in range(0, numOfRows-1):
-                    lastLine = corners[row*numOfColumns:row*numOfColumns+numOfColumns]
-                    curLine = corners[(row+1)*numOfColumns:(row+1)*numOfColumns+numOfColumns]
-                    logger.debug(f"Last line has indexes {row*numOfColumns}:{row*numOfColumns+numOfColumns}")
-                    logger.debug(f"Current line has indexes {(row+1)*numOfColumns}:{(row+1)*numOfColumns+numOfColumns}")
-                    depthData = bathymetry.gridData['DATA_2D']
+                depthData = bathymetry.gridData['DATA_2D']
+                # Iterate two rows at a time to gather cells' coords
+                for row in range(0, rowsOfCorners-1):
+                    lastLine = corners[row*colsOfCorners:row*colsOfCorners+colsOfCorners]
+                    curLine = corners[(row+1)*colsOfCorners:(row+1)*colsOfCorners+colsOfCorners]
+                    logger.debug(f"Last line has indexes {row*colsOfCorners}:{row*colsOfCorners+colsOfCorners}")
+                    logger.debug(f"Current line has indexes {(row+1)*colsOfCorners}:{(row+1)*colsOfCorners+colsOfCorners}")
                     for i in range(0, len(curLine)-1):
                         # Any group of 4 corners that has empty values is ignored
-                        
                         if EMPTY_VALUE in [
                                     lastLine[i][0], lastLine[i][1]
                                 ,   lastLine[i+1][0], lastLine[i+1][1]
@@ -170,8 +156,11 @@ def MOHIDBathymetry2shp(input_path, bathymetry):
                         vertices.append([originX + curLine[i+1][0], originY + curLine[i+1][1]])   # Top rigth corner
                         vertices.append([originX + curLine[i][0], originY + curLine[i][1]])       # Top left corner
                         parts.append(vertices)
-                        writer.poly(parts)
+                        # It's important to first write the record and then the 
+                        # feature geometry, otherwise, the geometry is written
+                        # to the previous record creating bad days
                         writer.record(ID=id, depth=depthData[depthInd])
+                        writer.poly(parts)
                         id += 1
                         depthInd += 1
     return
