@@ -25,7 +25,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class BathymetryTab(QTabWidget, FORM_CLASS):
 
-    def __init__(self, iface) -> None:
+    def __init__(self, iface, loadedBatLayers) -> None:
         super().__init__()
         logger.debug("Bathymetry tab init")
         # Setup UI elements
@@ -49,7 +49,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
         self.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
         QgsProject.instance().layersAdded.connect(self.updatebatComboBoxes)
         QgsProject.instance().layersRemoved.connect(self.updatebatComboBoxes)
-        self.loadedBatLayers = {}     
+        self.loadedBatLayers = loadedBatLayers  
 
     def addGridToLayer(self):
         logger.debug("Pressed Grid Add button")

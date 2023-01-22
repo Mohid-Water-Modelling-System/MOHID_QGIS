@@ -23,7 +23,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class LoadTab(QTabWidget, FORM_CLASS):
 
-    def __init__(self, iface) -> None:
+    def __init__(self, iface, loadedBatLayers) -> None:
         super().__init__()
         logger.debug("Load tab init")
         # Setup UI elements
@@ -49,7 +49,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
         # self.bat_fsBat.clicked.connect(self.openBatBrowser)
         self.bat_loadBatBtn.clicked.connect(self.loadBatToLayer)
         self.bat_saveBatBtn.clicked.connect(self.saveBatToMohidFile)
-        self.loadedBatLayers = {}     
+        self.loadedBatLayers = loadedBatLayers    
 
     def loadGridToLayer(self):
         file = QFileDialog.getOpenFileName(None, 'Load MOHID Grid file', 

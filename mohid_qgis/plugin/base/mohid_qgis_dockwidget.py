@@ -61,11 +61,12 @@ class MohidPluginDockWidget(QDockWidget):
         # #widgets-and-dialogs-with-auto-connect
         # self.setupUi(self)
 
+        self.loadedBatLayers = {}
         # Set up tabs
         tabs = QTabWidget()
         tabs.addTab(WhiteScroll(GridTab(iface, config)), "Grid")
-        tabs.addTab(WhiteScroll(BathymetryTab(iface)), "Bathymetry")
-        tabs.addTab(WhiteScroll(LoadTab(iface)), "Load")
+        tabs.addTab(WhiteScroll(BathymetryTab(iface, self.loadedBatLayers)), "Bathymetry")
+        tabs.addTab(WhiteScroll(LoadTab(iface, self.loadedBatLayers)), "Load")
         self.setWidget(tabs)
         self.tabs = tabs
 
