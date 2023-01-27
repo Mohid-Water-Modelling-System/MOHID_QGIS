@@ -17,12 +17,12 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'console',
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': str(Path(__file__).parent.absolute()/"mohid_qgis.log")
-        },
+        # 'file': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'formatter': 'file',
+        #     'filename': str(Path(__file__).parent.absolute()/"mohid_qgis.log")
+        # },
     },
     'loggers':{
         'mohid_qgis.plugin': {
