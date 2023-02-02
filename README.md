@@ -34,7 +34,10 @@ Visualization supported.
 
 ## MOHID XYZ files (.xyy)
 
-Visualization supported.
+Visualization supported. 
+When loading, a default style is applied to the layer that uses the "Spectral"
+color ramp and takes as minimum as maximum values the minimum and maximum depth
+values found in the layer.
 
 ## MOHID Bathymetry files
 
@@ -43,6 +46,9 @@ Visualization supported.
 Regular and curvillinear grid bathymetries are supported.
 
 Note that editing refers to the bathymetry depth values.
+
+When loading, a default style is applied to the layer in order to better 
+visualize the depth data.
 
 ### Generation
 

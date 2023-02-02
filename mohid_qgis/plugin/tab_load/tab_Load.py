@@ -127,6 +127,9 @@ class LoadTab(QTabWidget, FORM_CLASS):
             if not vlayer:
                 logger.error("Layer failed to load!")
             else:
+                stylePath = os.path.abspath(os.path.join(
+                        os.path.dirname( __file__ ), 'XYZ.qml'))
+                vlayer.loadNamedStyle(stylePath)
                 crs = vlayer.crs()
                 crs.createFromId(CRS_ID_DEFAULT) 
                 vlayer.setCrs(crs)
