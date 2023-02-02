@@ -184,7 +184,7 @@ class BathymetryTab(QTabWidget, FORM_CLASS):
                 # check file type
                 bat = MOHIDBathymetry(filepath)
                 MOHIDBathymetry2shp(filepath, bat)
-                shpPath = filepath.split(".")[0] + ".shp"
+                shpPath = filepath.replace(".dat", "") + ".shp"
                 vlayer = self.iface.addVectorLayer(
                                 shpPath,
                                 f"MOHID Bathymetry - {bat.filename}",

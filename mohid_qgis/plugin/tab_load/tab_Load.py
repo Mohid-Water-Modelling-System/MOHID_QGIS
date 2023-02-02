@@ -212,7 +212,7 @@ class LoadTab(QTabWidget, FORM_CLASS):
                         shpPath = filepath.replace(".dat", "") + ".shp"
                         vlayer = self.iface.addVectorLayer(
                                         shpPath,
-                                        f"MOHID Bathymetry - {bat.file.name}",
+                                        f"MOHID Bathymetry - {bat.filename}",
                                         "ogr")
                         if not vlayer:
                             logger.error("Layer failed to load!")
