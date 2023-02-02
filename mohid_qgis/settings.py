@@ -26,18 +26,18 @@ LOGGING = {
     },
     'loggers':{
         'mohid_qgis.plugin': {
-            'handlers': ['file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
         'mohid_qgis.core': {
-            'handlers': ['file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
     'root': {
-        'handlers': ['file'],
+        'handlers': ['console'],
         'level': 'DEBUG',
     }
 }
