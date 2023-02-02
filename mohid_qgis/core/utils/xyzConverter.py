@@ -9,7 +9,7 @@ def XYZ2shp(input_path):
 
             for line in input_f:
                 line = line.strip("\n")
-                if line in ["<begin_xyz>", "<end_xyz>", ""]:
+                if "<begin_xyz>" in line or "<end_xyz>" in line or line == "":
                     continue
                 else:
                     nums = list(filter(lambda x: x != '', line.split(" ")))
