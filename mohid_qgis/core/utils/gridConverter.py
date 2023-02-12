@@ -8,7 +8,7 @@ import numpy as np
 import logging
 logger = logging.getLogger(__name__)
 """
-LB_IUB - Two integer numbers defining the minimum and maximum I values along the Y-axis of the grid.
+ILB_IUB - Two integer numbers defining the minimum and maximum I values along the Y-axis of the grid.
 JLB_JUB - Two integer numbers defining the minimum and maximum J values along the X-axis of the grid.
 COORD_TIP - A flag which indicates the used coordinates type.
 ORIGIN - Two real values, which indicate the origin of the lower left corner of the grid (X Y).
@@ -251,25 +251,25 @@ def grid2shp(input_path, output_path = None):
                             constant_y = True
                         else:
                             constant_y = False
-                    elif i[0] == "<BeginXX>":
+                    elif "<BeginXX>" in i[0]:
                         # Read block of points
                         isPoint = True
                         while isPoint:
                             line = next(input_f).strip('\n').split(" ")
                             i = list(filter(
                                 lambda x: x not in ('',':','\t','\n'), line))
-                            if i[0] == "<EndXX>":
+                            if "<EndXX>" in i[0]:
                                 isPoint = False
                             else:
                                 POINTS_XX.append(float(i[0]))
-                    elif i[0] == "<BeginYY>":
+                    elif "<BeginYY>" in i[0]:
                         # Read block of points
                         isPoint = True
                         while isPoint:
                             line = next(input_f).strip('\n').split(" ")
                             i = list(filter(
                                 lambda x: x not in ('',':','\t','\n'), line))
-                            if i[0] == "<EndYY>":
+                            if "<EndYY>" in i[0]:
                                 isPoint = False
                             else:
                                 POINTS_YY.append(float(i[0]))
@@ -280,9 +280,9 @@ def grid2shp(input_path, output_path = None):
                 if constant_x and constant_y:
                     # Regular grid, built with DX, DY intervals
                     logger.info("Converting Regular Grid")
+                    # i_max and j_max are the max number of cells
                     for i in range(i_max):
                         for j in range(j_max):
-                            id+=1
                             vertices = []
                             parts = []
                             
@@ -294,25 +294,41 @@ def grid2shp(input_path, output_path = None):
                             parts.append(vertices)
                             writer.poly(parts)
                             writer.record(id)
+                            id+=1
                 elif POINTS_XX and POINTS_YY:
                     # Irregular grid, built with XX and YY points
                     logger.info("Converting Irregular Grid")
-                    for i in range(i_max):
-                        for j in range(j_max):
-                            id+=1
+                    yPoints = i_max + 1
+                    xPoints = j_max + 1
+                    # Remove 1 as we iterate two elements at the same time
+                    for i in range(yPoints-1):
+                        for j in range(xPoints-1):
                             vertices = []
                             parts = []
                             
                             # Cell vertices
                             # Special attention to first cell of each row
-                            vertices.append([origin_x + POINTS_XX[j], origin_y + POINTS_YY[i]])     # Bottom left corner
-                            vertices.append([origin_x + POINTS_XX[j + 1], origin_y + POINTS_YY[i]]) # Bottom rigth corner
-                            vertices.append([origin_x + POINTS_XX[j + 1], origin_y + POINTS_YY[i + 1]]) # # Top rigth corner
-                            vertices.append([origin_x + POINTS_XX[j], origin_y + POINTS_YY[i + 1]]) # Top left corner
+                            ind_bLeft = xPoints * i + j
+                            ind_bRight = xPoints * i + j + 1
+                            ind_tRight = xPoints * (i + 1) + j + 1
+                            ind_tLeft = xPoints * (i + 1) + j
+                            vertices.append([
+                                    POINTS_XX[ind_bLeft] 
+                                ,   POINTS_YY[ind_bLeft]]) # Bottom left corner
+                            vertices.append([
+                                    POINTS_XX[ind_bRight]
+                                ,   POINTS_YY[ind_bRight]]) # Bottom rigth corner
+                            vertices.append([
+                                    POINTS_XX[ind_tRight]
+                                ,   POINTS_YY[ind_tRight]]) # Top rigth corner
+                            vertices.append([
+                                    POINTS_XX[ind_tLeft]
+                                ,   POINTS_YY[ind_tLeft]]) # Top left corner
                             
                             parts.append(vertices)
                             writer.poly(parts)
                             writer.record(id)
+                            id+=1
                 else:
                     logger.warning("Invalid grid file")
                     return None

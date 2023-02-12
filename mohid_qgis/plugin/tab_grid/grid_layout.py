@@ -210,32 +210,64 @@ class GridVariableLayout(GridLayout):
     and column number - points[row][column] .
     """
     def toPoints(self, origin: Origin, angle: Angle) -> List[List[Point]]:
-        cls = self.getColLayouts()
-        rls = self.getRowLayouts()
+        columnLayouts = self.getColLayouts()
+        rowLayouts = self.getRowLayouts()
         x = origin.x()
         y = origin.y()
 
         points = []
         yOffset = 0
-        for rl in rls:
-            yVariation = (rl.getSpacingEnd() -
-                          rl.getSpacingStart()) / rl.getN()
-            for r in range(rl.getN() + 1):
+        for rowLayout in rowLayouts:
+            rowLen = rowLayout.getN() + 1
+            yVariation = (rowLayout.getSpacingEnd() -
+                        rowLayout.getSpacingStart()) / rowLen
+            for r in range(rowLen):
                 row = []
                 xOffset = 0
-                for cl in cls:
-                    xVariation = (cl.getSpacingEnd() -
-                                  cl.getSpacingStart()) / cl.getN()
-                    for c in range(cl.getN() + 1):
+                for columnLayout in columnLayouts:
+                    colLen = columnLayout.getN() + 1
+                    xVariation = (columnLayout.getSpacingEnd() -
+                        columnLayout.getSpacingStart()) / colLen
+
+                    for c in range(colLen):
+                        print(f"col: {c}")
                         point = Point(x + xOffset, y + yOffset)
                         point.rotate(origin, angle)
-                        row.append(point)
-                        xOffset += cl.getSpacingStart() + (c * xVariation)
-                points.append(row)
-                yOffset += rl.getSpacingStart() + (r * yVariation)
+                        # equal to the first point of the next layout
+                        # Don't add repeated points
+                        if not row or point != row[-1]:
+                            row.append(point)
+                        # Don't add offset to the last point so that it can be
+                        if c != colLen - 1:
+                            xOffset += columnLayout.getSpacingStart() + (c * xVariation)
+                # Don't add repeated rows
+                if not points or points[-1] != row:
+                    points.append(row)
+                # Don't add offset to the last point so that it can be
+                # equal to the first point of the next layout
+                if r != rowLen - 1:
+                    yOffset += rowLayout.getSpacingStart() + (r * yVariation)
 
         return points
 
+    def toCells(self, origin: Origin, angle: Angle) -> List[List[Cell]]:
+        points = self.toPoints(origin, angle)
+        nRows = self.getNRows()
+        nCols = self.getNCols()
+
+        cells = []
+        for r in range(nRows):
+            row = []
+            for c in range(nCols):
+                pA = points[r][c]         # Bottom left
+                pB = points[r][c + 1]     # Bottom right
+                pC = points[r + 1][c + 1] # Top right
+                pD = points[r + 1][c]     # Top left
+                cell = Cell(pA, pB, pC, pD)
+                row.append(cell)
+            cells.append(row)
+        return cells
+    
     """
     The toString function is used to write the layout of the grid in MOHID format.
     The string is built according to the first argument of the function, which is
@@ -244,4 +276,8 @@ class GridVariableLayout(GridLayout):
     """
     #TODO: complete this function
     def toString(self, config: dict) -> str:
-        return ""
+        fmt = config["fmt"]
+        return fmt.format("CONSTANT_SPACING_X", 0) + \
+            fmt.format("CONSTANT_SPACING_Y", 0) + \
+            fmt.format("ILB_IUB", f"1 {self.getNRows()}") + \
+            fmt.format("JLB_JUB", f"1 {self.getNCols()}")
