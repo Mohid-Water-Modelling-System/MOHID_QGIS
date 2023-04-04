@@ -1,3 +1,4 @@
+from typing import List
 import shapefile
 import os
 import sys
@@ -31,6 +32,15 @@ DY - Constant spacing distance in YY axis
 #print(rootgrp1.dimensions)
 #print(rootgrp2.dimensions)
 
+def rotatePoint(point: List, origin: List, angle: float):
+        cos = math.cos(math.radians(angle))
+        sin = math.sin(math.radians(angle))
+        x = point[0]
+        y = point[1]
+        xO = origin[0]
+        yO = origin[1]
+        return [xO + cos * (x - xO) - sin * (y - yO),
+                    yO + sin * (x - xO) + cos * (y - yO)]
 
 def grid2netCDF(input_path):
     rootgrp = netCDF4.Dataset(os.path.splitext(input_path)[0] + ".nc", "w", format="NETCDF4")
@@ -286,10 +296,22 @@ def grid2shp(input_path, output_path = None):
                             vertices = []
                             parts = []
                             
-                            vertices.append([origin_x + dx * j, origin_y + (i_max - i - 1) * dy]) #4
-                            vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]) #3
-                            vertices.append([origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]) #2
-                            vertices.append([origin_x + dx * j, origin_y + (i_max - i) * dy]) #1
+                            vertices.append(rotatePoint(
+                                    [origin_x + dx * j, origin_y + (i_max - i - 1) * dy]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) #4
+                            vertices.append(rotatePoint(
+                                    [origin_x + dx * (j + 1), origin_y + (i_max - i - 1)* dy]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) #3
+                            vertices.append(rotatePoint(
+                                    [origin_x + dx * (j + 1), origin_y + (i_max - i) * dy]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) #2
+                            vertices.append(rotatePoint(
+                                    [origin_x + dx * j, origin_y + (i_max - i) * dy]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) #1
                             
                             parts.append(vertices)
                             writer.poly(parts)
@@ -308,22 +330,26 @@ def grid2shp(input_path, output_path = None):
                             
                             # Cell vertices
                             # Special attention to first cell of each row
-                            ind_bLeft = xPoints * i + j
-                            ind_bRight = xPoints * i + j + 1
-                            ind_tRight = xPoints * (i + 1) + j + 1
-                            ind_tLeft = xPoints * (i + 1) + j
-                            vertices.append([
-                                    POINTS_XX[ind_bLeft] 
-                                ,   POINTS_YY[ind_bLeft]]) # Bottom left corner
-                            vertices.append([
-                                    POINTS_XX[ind_bRight]
-                                ,   POINTS_YY[ind_bRight]]) # Bottom rigth corner
-                            vertices.append([
-                                    POINTS_XX[ind_tRight]
-                                ,   POINTS_YY[ind_tRight]]) # Top rigth corner
-                            vertices.append([
-                                    POINTS_XX[ind_tLeft]
-                                ,   POINTS_YY[ind_tLeft]]) # Top left corner
+                            vertices.append(rotatePoint(
+                                    [   origin_x + POINTS_XX[j]
+                                    ,   origin_y + POINTS_YY[i]]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) # Bottom left corner
+                            vertices.append(rotatePoint(
+                                    [   origin_x + POINTS_XX[j + 1]
+                                    ,   origin_y + POINTS_YY[i]]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) # Bottom rigth corner
+                            vertices.append(rotatePoint(
+                                    [origin_x + POINTS_XX[j + 1]
+                                    ,   origin_y + POINTS_YY[i + 1]]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) # Top rigth corner
+                            vertices.append(rotatePoint(
+                                    [origin_x + POINTS_XX[j]
+                                    ,   origin_y + POINTS_YY[i + 1]]
+                                ,   [origin_x, origin_y]
+                                ,   angle)) # Top left corner
                             
                             parts.append(vertices)
                             writer.poly(parts)

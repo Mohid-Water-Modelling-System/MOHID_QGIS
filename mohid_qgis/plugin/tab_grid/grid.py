@@ -1,5 +1,5 @@
 from qgis.core import QgsVectorLayer, QgsFeature
-from .grid_layout import GridLayout, GridRegularLayout
+from .grid_layout import GridLayout, GridRegularLayout, GridVariableLayout
 from .point import Origin
 from .crs import CRS
 from .angle import Angle
@@ -117,23 +117,27 @@ class Grid:
         angle = self.getAngle()
         crs = self.getCrs()
         layout = self.getLayout()
-
+        upperRightCorner = layout.toPoints(origin, angle)[-1][-1]
+        lon = (origin.x() + upperRightCorner.x()) / 2.0
+        lat = (origin.y() + upperRightCorner.y()) / 2.0
         output = origin.toString(config) + angle.toString(config) \
             + crs.toString(config) + layout.toString(config)
+        output += f"LATITUDE               : {lat}\n"
+        output += f"LONGITUDE              : {lon}\n"
         
-        points = layout.toPoints(origin, angle)
-        POINTS_XX = [points[row][col].x() for row in range(0, len(points)) for col in range(0, len(points[0]))]
-        POINTS_YY = [points[row][col].y() for row in range(0, len(points)) for col in range(0, len(points[0]))]
-        output += "\n\n"
-        output += "<BeginXX>\n"
-        for p in POINTS_XX:
-            output += f"{p:.15f}\n"
-        output += "<EndXX>\n"
+        if isinstance(layout, GridVariableLayout):
+            DX, DY = layout.offsets()
 
-        output += "<BeginYY>\n"
-        for p in POINTS_YY:
-            output += f"{p:.15f}\n"
-        output += "<EndYY>\n"
+            output += "\n\n"
+            output += "<BeginXX>\n"
+            for p in DX:
+                output += f"{p:.15f}\n"
+            output += "<EndXX>\n"
+
+            output += "<BeginYY>\n"
+            for p in DY:
+                output += f"{p:.15f}\n"
+            output += "<EndYY>\n"
 
         return output
     

@@ -64,6 +64,9 @@ class GridLayout:
     def toString(self, config: dict) -> str:
         pass
 
+    def offsets(self):
+        pass
+
 """
 The GridRegularLayout is used to build a regular grid: All columns have the same spacing
 and all rows have the same spacing.
@@ -201,6 +204,38 @@ class GridVariableLayout(GridLayout):
         n = sum([i.getN() for i in l])
         return n
 
+
+    def offsets(self):
+        columnLayouts = self.getColLayouts()
+        rowLayouts = self.getRowLayouts()
+        offsetsXX = [0.0]
+        offsetsYY = [0.0]
+        yOffset = 0
+        for indRow, rowLayout in enumerate(rowLayouts):
+            yLen = rowLayout.getN() + 1
+            yVariation = (rowLayout.getSpacingEnd() -
+                        rowLayout.getSpacingStart()) / yLen
+            if indRow == len(rowLayouts):
+                endY = yLen + 1
+            else:
+                endY = yLen
+            for r in range(1, endY):
+                yOffset += rowLayout.getSpacingStart() + (r * yVariation)   
+                offsetsYY.append(yOffset)
+        xOffset = 0
+        for indCol, columnLayout in enumerate(columnLayouts):
+            xLen = columnLayout.getN() + 1
+            xVariation = (columnLayout.getSpacingEnd() -
+                columnLayout.getSpacingStart()) / xLen
+            if indCol == len(columnLayouts):
+                endX = xLen + 1
+            else:
+                endX = xLen
+            for c in range(1, endX):
+                xOffset += columnLayout.getSpacingStart() + (c * xVariation)   
+                offsetsXX.append(xOffset)
+                
+        return offsetsXX, offsetsYY
     """
     The toPoints function returns the points that define the corners of the grid cells.
     To call this function the GridLayout must already have the rows and columns defined
@@ -210,44 +245,19 @@ class GridVariableLayout(GridLayout):
     and column number - points[row][column] .
     """
     def toPoints(self, origin: Origin, angle: Angle) -> List[List[Point]]:
-        columnLayouts = self.getColLayouts()
-        rowLayouts = self.getRowLayouts()
+        
+        points = []
+        offsetsXX, offsetsYY = self.offsets()
         x = origin.x()
         y = origin.y()
-
-        points = []
-        yOffset = 0
-        for rowLayout in rowLayouts:
-            rowLen = rowLayout.getN() + 1
-            yVariation = (rowLayout.getSpacingEnd() -
-                        rowLayout.getSpacingStart()) / rowLen
-            for r in range(rowLen):
-                row = []
-                xOffset = 0
-                for columnLayout in columnLayouts:
-                    colLen = columnLayout.getN() + 1
-                    xVariation = (columnLayout.getSpacingEnd() -
-                        columnLayout.getSpacingStart()) / colLen
-
-                    for c in range(colLen):
-                        print(f"col: {c}")
-                        point = Point(x + xOffset, y + yOffset)
-                        point.rotate(origin, angle)
-                        # equal to the first point of the next layout
-                        # Don't add repeated points
-                        if not row or point != row[-1]:
-                            row.append(point)
-                        # Don't add offset to the last point so that it can be
-                        if c != colLen - 1:
-                            xOffset += columnLayout.getSpacingStart() + (c * xVariation)
-                # Don't add repeated rows
-                if not points or points[-1] != row:
-                    points.append(row)
-                # Don't add offset to the last point so that it can be
-                # equal to the first point of the next layout
-                if r != rowLen - 1:
-                    yOffset += rowLayout.getSpacingStart() + (r * yVariation)
-
+        for dy in offsetsYY:
+            row = []
+            for dx in offsetsXX:
+                point = Point(x + dx, y + dy)
+                point.rotate(origin, angle)
+                row.append(point)
+            points.append(row)
+        
         return points
 
     def toCells(self, origin: Origin, angle: Angle) -> List[List[Cell]]:

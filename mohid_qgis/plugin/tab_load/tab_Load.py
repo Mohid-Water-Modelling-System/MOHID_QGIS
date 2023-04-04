@@ -57,10 +57,14 @@ class LoadTab(QTabWidget, FORM_CLASS):
         
         def getGridType(gridFile):
             with Path(gridFile).open() as f: 
-                cleanFile = list(map(lambda x: x.strip(), f.readlines()))
+                cleanFile = list(map(lambda x: x.replace(" ", "").strip(),
+                                      f.readlines()))
             if "<CornersXY>" in cleanFile:
                 return "curvillinear"
             elif "<BeginXX>" in cleanFile:
+                return "regular"
+            elif (  "CONSTANT_SPACING_X:1" in cleanFile
+                and "CONSTANT_SPACING_Y:1" in cleanFile):
                 return "regular"
             else:
                 raise RuntimeError("Invalid MOHID format!")
